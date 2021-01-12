@@ -246,7 +246,8 @@
 		5A5688EC25ADFFC4002293E8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
 				CURRENT_PROJECT_VERSION = 17;
 				DEVELOPMENT_TEAM = Y5J3K52DNA;
@@ -256,6 +257,7 @@
 				OBJROOT = $SRCROOT/build/pkgroot;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bps.utitool;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -263,7 +265,8 @@
 		5A5688ED25ADFFC4002293E8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
 				CURRENT_PROJECT_VERSION = 17;
 				DEVELOPMENT_TEAM = Y5J3K52DNA;
@@ -273,6 +276,7 @@
 				OBJROOT = $SRCROOT/build/pkgroot;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bps.utitool;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
