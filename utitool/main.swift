@@ -71,6 +71,7 @@ func processRelativePath(_ relativePath: String) -> String {
     return (absolutePath as NSString).standardizingPath
 }
 
+
 func report(_ message: String) {
 
     // Generic message display routine
