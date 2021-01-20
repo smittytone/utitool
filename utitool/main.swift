@@ -101,7 +101,7 @@ func writeToStderr(_ message: String) {
 
     // Write errors and other messages to stderr
 
-    writeTo(STD_ERR, message)
+    write(message: message, to: STD_ERR)
 }
 
 
@@ -109,13 +109,14 @@ func writeToStdout(_ message: String) {
 
     // Write errors and other messages to stderr
 
-    writeTo(STD_OUT, message)
+    write(message: message, to: STD_OUT)
 }
 
 
-func writeTo(_ fileHandle: FileHandle, _ text: String) {
+func write(message text: String, to fileHandle: FileHandle) {
     
     // Write text to the specified channel
+    
     if let textAsData: Data = (text  + "\r\n").data(using: .utf8) {
         fileHandle.write(textAsData)
     }
@@ -129,7 +130,7 @@ func showHelp() {
     showHeader()
 
     report("\nA macOS tool to reveal a file’s Uniform Type Identifier (UTI).")
-    report("Copyright 2021, Tony Smith (@smittytone). Source code available under the MIT licence.\r\n")
+    report("Copyright © 2021, Tony Smith (@smittytone). Source code available under the MIT licence.\r\n")
     report(BOLD + "USAGE" + RESET + "\n    utitool [path 1] [path 2] ... [path " + ITALIC + "n" + RESET + "]\r\n")
     report(BOLD + "EXAMPLES" + RESET)
     report("    utitool *                 -- Get data for all the files in the working directory.")
@@ -193,6 +194,8 @@ if args.count == 1 {
                 // Tally the number of files reported on
                 count += 1
             }
+        } else {
+            reportError("\(path) not a valid file reference")
         }
     }
     
