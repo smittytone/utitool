@@ -1,9 +1,11 @@
-# utitool 1.0.0
+# utitool 1.0.1
 
 *utitool* is a macOS command line tool you can use to reveal a file’s Uniform Type Identifier (UTI). For more details, [see here](https://smittytone.net/utitool/index.html).
 
 ## Release Notes ##
 
+- 1.0.1 *Unreleased*
+    - Tiny bit of refactoring.
 - 1.0.0 *12 January 2021*
     - Initial public release.
 
