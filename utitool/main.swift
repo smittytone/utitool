@@ -129,7 +129,7 @@ func showHelp() {
 
     showHeader()
 
-    report("\nA macOS tool to reveal a file’s Uniform Type Identifier (UTI).")
+    report("\nA macOS tool to reveal a specified file’s Uniform Type Identifier (UTI).")
     report("Copyright © 2021, Tony Smith (@smittytone). Source code available under the MIT licence.\r\n")
     report(BOLD + "USAGE" + RESET + "\n    utitool [path 1] [path 2] ... [path " + ITALIC + "n" + RESET + "]\r\n")
     report(BOLD + "EXAMPLES" + RESET)
