@@ -4,7 +4,7 @@
 
 ## Release Notes ##
 
-- 1.0.1 *Unreleased*
+- 1.0.1 *4 February 2021*
     - Tiny bit of refactoring.
 - 1.0.0 *12 January 2021*
     - Initial public release.
