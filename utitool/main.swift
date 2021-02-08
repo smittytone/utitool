@@ -148,7 +148,7 @@ func showHeader() {
     let version: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
     let build: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as! String
     let name:String = Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as! String
-    report("\(name) \(version) (\(build))")
+    report(BOLD + "\(name) \(version) (\(build))" + RESET)
 }
 
 
