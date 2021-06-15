@@ -5,8 +5,8 @@
 ## Release Notes ##
 
 
-- 1.0.3 *Unreleased*
-    - Add support for macOS 11’s `UTType` API.
+- 1.0.3 *15 June 2021*
+    - Add support for macOS 11 Big Sur’s `UTType` API.
 - 1.0.2 *8 February 2021*
     - Minor change to help text.
 - 1.0.1 *4 February 2021*
