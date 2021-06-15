@@ -26,6 +26,8 @@
 
 
 import Foundation
+// FROM 1.0.3 -- Use macOS 11's UTI library
+import UniformTypeIdentifiers
 
 
 // MARK: - Constants
@@ -212,6 +214,27 @@ exit(EXIT_SUCCESS)
 // MARK: - URL Extension
 
 extension URL {
-    var typeIdentifier: String? { (try? resourceValues(forKeys: [.typeIdentifierKey]))?.typeIdentifier }
-    var localizedName: String? { (try? resourceValues(forKeys: [.localizedNameKey]))?.localizedName }
+    
+    var typeIdentifier: String? {
+        
+        // FROM 1.0.3
+        // Add support for Big Sur UTType functionality
+        if #available(macOS 11, *) {
+            let resourceValues: URLResourceValues? = try? resourceValues(forKeys: [.contentTypeKey])
+            if let uti: UTType = resourceValues!.contentType {
+                return uti.identifier
+            } else {
+                return nil
+            }
+        } else {
+            let resourceValues: URLResourceValues? = try? resourceValues(forKeys: [.typeIdentifierKey])
+            return resourceValues!.typeIdentifier
+        }
+    }
+    
+    var localizedName: String? {
+        let resourceValues: URLResourceValues? = try? resourceValues(forKeys: [.localizedNameKey])
+        return resourceValues!.localizedName
+    }
+        
 }
