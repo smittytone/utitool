@@ -36,15 +36,15 @@ let STD_ERR: FileHandle = FileHandle.standardError
 let STD_OUT: FileHandle = FileHandle.standardOutput
 
 // TTY formatting
-let RED: String = "\u{001B}[31m"
-let YELLOW: String = "\u{001B}[33m"
-let RESET: String = "\u{001B}[0m"
-let BOLD: String = "\u{001B}[1m"
-let ITALIC: String = "\u{001B}[3m"
-let BSP: String = String(UnicodeScalar(8))
+let RED: String             = "\u{001B}[31m"
+let YELLOW: String          = "\u{001B}[33m"
+let RESET: String           = "\u{001B}[0m"
+let BOLD: String            = "\u{001B}[1m"
+let ITALIC: String          = "\u{001B}[3m"
+let BSP: String             = String(UnicodeScalar(8))
 // FROM 1.0.4
 let EXIT_CTRL_C_CODE: Int32 = 130
-let CTRL_C_MSG: String = "\(BSP)\(BSP)\rutitool interrupted -- halting"
+let CTRL_C_MSG: String      = "\(BSP)\(BSP)\rutitool interrupted -- halting"
 
 
 // MARK: - Functions
