@@ -32,16 +32,19 @@ import UniformTypeIdentifiers
 
 // MARK: - Constants
 
-let STD_ERR = FileHandle.standardError
-let STD_OUT = FileHandle.standardOutput
+let STD_ERR: FileHandle = FileHandle.standardError
+let STD_OUT: FileHandle = FileHandle.standardOutput
 
 // TTY formatting
-let RED = "\u{001B}[31m"
-let YELLOW = "\u{001B}[33m"
-let RESET = "\u{001B}[0m"
-let BOLD = "\u{001B}[1m"
-let ITALIC = "\u{001B}[3m"
-let BSP = String(UnicodeScalar(8))
+let RED: String = "\u{001B}[31m"
+let YELLOW: String = "\u{001B}[33m"
+let RESET: String = "\u{001B}[0m"
+let BOLD: String = "\u{001B}[1m"
+let ITALIC: String = "\u{001B}[3m"
+let BSP: String = String(UnicodeScalar(8))
+// FROM 1.0.4
+let EXIT_CTRL_C_CODE: Int32 = 130
+let CTRL_C_MSG: String = "\(BSP)\(BSP)\rutitool interrupted -- halting"
 
 
 // MARK: - Functions
@@ -157,10 +160,21 @@ func showHeader() {
 // MARK: - Runtime Start
 
 // Trap CTRL-C
-signal(SIGINT) {
-    theSignal in report("\(BSP)\(BSP)\rutitool interrupted -- halting")
-    exit(EXIT_FAILURE)
+// Make sure the signal does not terminate the application
+signal(SIGINT, SIG_IGN)
+
+// Set up an event source for SIGINT...
+let dss: DispatchSourceSignal = DispatchSource.makeSignalSource(signal: SIGINT,
+                                                                queue: DispatchQueue.main)
+// ...add an event handler (from above)...
+dss.setEventHandler {
+    writeToStderr(CTRL_C_MSG)
+    exit(EXIT_CTRL_C_CODE)
 }
+
+// ...and start the event flow
+dss.resume()
+
 
 // Get the command line args...
 var args = CommandLine.arguments
