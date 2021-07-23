@@ -4,7 +4,7 @@
 
 ## Release Notes ##
 
-- 1.0.4 *Unreleased*
+- 1.0.4 *23 July 2021*
     - Add async signal safe ctrl-c trapping code.
 - 1.0.3 *15 June 2021*
     - Add support for macOS 11 Big Sur’s `UTType` API.
