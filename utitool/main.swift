@@ -135,7 +135,7 @@ func showHelp() {
     showHeader()
 
     report("\nA macOS tool to reveal a specified file’s Uniform Type Identifier (UTI).")
-    report("Copyright © 2021, Tony Smith (@smittytone). Source code available under the MIT licence.\r\n")
+    report("Copyright © 2025, Tony Smith (@smittytone). Source code available under the MIT licence.\r\n")
     report(BOLD + "USAGE" + RESET + "\n    utitool [path 1] [path 2] ... [path " + ITALIC + "n" + RESET + "]\r\n")
     report(BOLD + "EXAMPLES" + RESET)
     report("    utitool *                 -- Get data for all the files in the working directory.")
@@ -202,7 +202,14 @@ if args.count == 1 {
                 
                 // And output the UTI if we can
                 if let uti = url.typeIdentifier {
-                    writeToStdout("UTI for \(path): \(uti)")
+                    var kind = ""
+                    if url.known {
+                        kind = "system- or application"
+                    } else if uti.hasPrefix("dyn") {
+                        kind = "dynamically"
+                    }
+                    
+                    writeToStdout("UTI for \(path): \(uti) (\(kind)-declared type)")
                 } else {
                     reportError("Could not get UTI for \(path)")
                 }
@@ -250,5 +257,17 @@ extension URL {
         let resourceValues: URLResourceValues? = try? resourceValues(forKeys: [.localizedNameKey])
         return resourceValues!.localizedName
     }
+    
+    var known: Bool {
         
+        if #available(macOS 11, *) {
+            let resourceValues: URLResourceValues? = try? resourceValues(forKeys: [.contentTypeKey])
+            if let uti: UTType = resourceValues!.contentType {
+                return uti.isDeclared
+            }
+        }
+        
+        return false
+    }
+
 }
