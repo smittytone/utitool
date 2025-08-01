@@ -301,17 +301,18 @@ func showHelp() {
     showHeader()
 
     report("\nA macOS tool to reveal a specified file’s Uniform Type Identifier (UTI).")
-    report("It can also be used to display information about a specific UTI, or a supplied file extension.")
-    report("Copyright © 2025, Tony Smith (@smittytone). Source code available under the MIT licence.\r\n")
-    report("\(BOLD)USAGE\(RESET)\n    utitool [-e {extension}] [-u {UTI}] [path 1] [path 2] ... [path \(ITALIC)n\(RESET)]\r\n")
+    report("It can also be used to display information about a specific UTI, or a supplied file extension.\r\n")
+    report("\(BOLD)USAGE\(RESET)\n    utitool [-e {extension}] [-u {UTI}] [-m] [path 1] [path 2] ... [path \(ITALIC)n\(RESET)]\r\n")
     report("\(BOLD)EXAMPLES\(RESET)")
     report("    utitool *                      -- Get data for all the files in the working directory.")
     report("    utitool text.md                -- Get data for a named file in the working directory.")
+    report("    utitool -m text.md             -- Get data for a named file in the working directory and include extra UTI information.")
     report("    utitool text1.md text2.md      -- Get data for named files in the working directory.")
     report("    utitool /User/me/text1.md      -- Get data for any named file.")
     report("    utitool ../text1.md            -- Get data for a named file in the parent directory.")
     report("    utitool -e md                  -- Get data about UTIs associated with the file extenions \(ITALIC)md\(RESET).")
     report("    utitool -u com.bps.rust-source -- Get data about UTIs associated with the UTI \(ITALIC)com.bps.rust-source\(RESET).")
+    report("\r\nCopyright © 2025, Tony Smith (@smittytone). Source code available under the MIT licence.")
 }
 
 
@@ -389,17 +390,13 @@ if args.count == 1 {
             }
         } else {
             switch argument {
-                case "--extension":
-                    fallthrough
-                case "-e":
+                case "--extension", "-e":
                     argIsAValue = true
                     argType = 1
-                case "--uti":
-                    fallthrough
-                case "-u":
+                case "--uti", "-u":
                     argIsAValue = true
                     argType = 2
-                case "-m":
+                case "--more", "-m":
                     showMoreInfo = true
                 case "-h":
                     fallthrough
@@ -438,7 +435,7 @@ if args.count == 1 {
                 if isDir.boolValue {
                     continue
                 }
-                
+
                 // Make a URL from the path
                 let url: URL = URL(fileURLWithPath: path, isDirectory: false)
 
