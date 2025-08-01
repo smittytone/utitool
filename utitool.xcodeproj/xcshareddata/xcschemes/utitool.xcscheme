@@ -57,6 +57,18 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "-i net.zest.fart"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-i net.daringfireball.markdown"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-e md"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "/Users/smitty/GitHub/RingCLI2/test.zak"
             isEnabled = "NO">
          </CommandLineArgument>
@@ -66,9 +78,20 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/Users/smitty/GitHub/RingCLI2/main.go"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/smitty/GitHub/RP2040-FreeRTOS/deploy.sh /Users/smitty/GitHub/RingCLI2/main.go"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = ""
+            value = ""
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
