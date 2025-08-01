@@ -38,6 +38,7 @@ let STD_OUT: FileHandle = FileHandle.standardOutput
 // TTY formatting
 let RED: String             = "\u{001B}[31m"
 let YELLOW: String          = "\u{001B}[33m"
+let MAGENTA: String         = "\u{001B}[35m"
 let RESET: String           = "\u{001B}[0m"
 let BOLD: String            = "\u{001B}[1m"
 let ITALIC: String          = "\u{001B}[3m"
@@ -65,7 +66,7 @@ func getExtensionData(_ fileExtension: String) -> Int32 {
         extn = String(extn.dropFirst())
     }
 
-    // Get UIT data from the extension
+    // Get UTI data from the extension
     let utiTypes = UTType.types(tag: extn, tagClass: .filenameExtension , conformingTo: nil)
     if utiTypes.count > 0 {
         writeToStderr("\(BOLD)UTI information for file extension \(YELLOW).\(extn):\(RESET)")
@@ -102,7 +103,7 @@ func getExtensionData(_ fileExtension: String) -> Int32 {
 func getUtiData(_ uti: String) -> Int32 {
 
     if let utiType = UTType(uti) {
-        writeToStderr("\(BOLD)Information for UIT \(YELLOW).\(utiType.identifier):\(RESET)")
+        writeToStderr("\(BOLD)Information for UTI \(YELLOW).\(utiType.identifier)\(RESET):")
         outputDescription(utiType)
 
         if utiType.tags.count > 0 {
@@ -160,19 +161,19 @@ func outputTags(_ tags:  [UTTagClass : [String]], _ tagClass: UTTagClass) {
     }
 
     // Add the tag values
-    for (key, value) in tags {
-        if key == tagClass {
-            if value.count > 0 {
-                var items = ""
-                for item in value {
-                    items += item + ", "
-                }
-
-                writeToStderr("    \(tagText.capitaliseFirst()) registered: \(items.dropLast(2))")
-            } else {
-                writeToStderr("    No \(tagText) registered")
+    if let value = tags[tagClass] {
+        if value.count > 0 {
+            var items = ""
+            for item in value {
+                items += item + ", "
             }
+
+            writeToStderr("    \(tagText.capitaliseFirst()) registered: \(items.dropLast(2))")
+        } else {
+            writeToStderr("    No \(tagText) registered")
         }
+    } else {
+        writeToStderr("    No \(tagText) registered")
     }
 }
 
@@ -441,16 +442,18 @@ if args.count == 1 {
 
                 // And output the UTI if we can
                 if let uti = url.typeIdentifier {
-                    var kind = ""
+                    var extra = ""
                     if url.known {
-                        kind = "system- or application"
+                        extra = "UTI is registered with the system"
                     } else if uti.hasPrefix("dyn") {
-                        kind = "dynamically"
+                        extra = "UTI was dynamically assigned"
                     }
 
-                    writeToStdout("UTI for \(path): \(uti) (\(kind)-declared type)")
                     if showMoreInfo {
+                        writeToStdout("UTI for \(path): \(MAGENTA)\(uti)\(RESET)")
                         _ = getUtiData(uti)
+                    } else {
+                        writeToStdout("UTI for \(path): \(MAGENTA)\(uti)\(RESET) (\(extra))")
                     }
                 } else {
                     reportError("Could not get UTI for \(path)")
