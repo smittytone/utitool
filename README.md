@@ -1,9 +1,18 @@
-# utitool 1.0.4
+# utitool 1.1.0
 
-*utitool* is a macOS command line tool you can use to reveal a file’s Uniform Type Identifier (UTI). For more details, [see here](https://smittytone.net/utitool/index.html).
+*utitool* is a macOS command line tool you can use to reveal a file’s Uniform Type Identifier (UTI).
+
+It can also be used to reveal information about a specified UTI, or the UTI(s) bound to a specified file extension.
+
+For more details, [see here](https://smittytone.net/utitool/index.html).
 
 ## Release Notes ##
 
+- 1.1.0 *Unreleased*
+    - Add extra file information.
+    - Add `--extension` option to show info about specified a file extension.
+    - Add `--uti` option to show info about a specified UTI.
+    - Add `--more` option to show extra UTI information about specified files.
 - 1.0.4 *23 July 2021*
     - Add async signal safe ctrl-c trapping code.
 - 1.0.3 *15 June 2021*
@@ -17,4 +26,4 @@
 
 ## Licence ##
 
-*utitool* is copyright © 2021, Tony Smith. Its source code is released under the MIT Licence.
+*utitool* is copyright © 2025, Tony Smith. Its source code is released under the MIT Licence.
