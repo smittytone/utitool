@@ -1,6 +1,6 @@
 /*
     utitool
-    main.swift
+    extensions.swift
 
     Copyright © 2025 Tony Smith. All rights reserved.
 
@@ -74,5 +74,35 @@ extension String {
 
     func capitaliseFirst() -> String {
         return prefix(1).uppercased() + self.dropFirst()
+    }
+}
+
+
+extension Scanner {
+
+    /**
+     Look ahead and return the next character in the sequence without
+     altering the current location of the scanner.
+
+     - Parameters
+        - in: The string being scanned.
+
+     - Returns The next character as a string.
+     */
+    func getNextCharacter(in outer: String) -> String {
+
+        let string: NSString = self.string as NSString
+        let idx: Int = self.currentIndex.utf16Offset(in: outer)
+        let nextChar: String = string.substring(with: NSMakeRange(idx, 1))
+        return nextChar
+    }
+
+
+    /**
+     Step over the next character.
+     */
+    func skipNextCharacter() {
+
+        self.currentIndex = self.string.index(after: self.currentIndex)
     }
 }

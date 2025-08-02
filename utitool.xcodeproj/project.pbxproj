@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		3B42AF142E3CD0A100FF6743 /* extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B42AF132E3CD0A100FF6743 /* extensions.swift */; };
+		3BDDE23F2E3E299800BB8AD4 /* processes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BDDE23E2E3E299800BB8AD4 /* processes.swift */; };
+		3BDDE2412E3E672100BB8AD4 /* entities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BDDE2402E3E672100BB8AD4 /* entities.swift */; };
 		5A5688E825ADFFC4002293E8 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5688E725ADFFC4002293E8 /* main.swift */; };
 /* End PBXBuildFile section */
 
@@ -25,6 +27,8 @@
 
 /* Begin PBXFileReference section */
 		3B42AF132E3CD0A100FF6743 /* extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = extensions.swift; sourceTree = "<group>"; };
+		3BDDE23E2E3E299800BB8AD4 /* processes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = processes.swift; sourceTree = "<group>"; };
+		3BDDE2402E3E672100BB8AD4 /* entities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = entities.swift; sourceTree = "<group>"; };
 		5A5688E425ADFFC4002293E8 /* utitool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = utitool; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A5688E725ADFFC4002293E8 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		5A5688EF25AE001C002293E8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -61,7 +65,9 @@
 			isa = PBXGroup;
 			children = (
 				5A5688E725ADFFC4002293E8 /* main.swift */,
+				3BDDE2402E3E672100BB8AD4 /* entities.swift */,
 				3B42AF132E3CD0A100FF6743 /* extensions.swift */,
+				3BDDE23E2E3E299800BB8AD4 /* processes.swift */,
 				5A5688EF25AE001C002293E8 /* Info.plist */,
 			);
 			path = utitool;
@@ -125,7 +131,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3BDDE23F2E3E299800BB8AD4 /* processes.swift in Sources */,
 				5A5688E825ADFFC4002293E8 /* main.swift in Sources */,
+				3BDDE2412E3E672100BB8AD4 /* entities.swift in Sources */,
 				3B42AF142E3CD0A100FF6743 /* extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -261,13 +269,13 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 26;
+				CURRENT_PROJECT_VERSION = 27;
 				DEAD_CODE_STRIPPING = YES;
 				DSTROOT = $SRCROOT/build/pkgroot;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/utitool/Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 11.5;
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				OBJROOT = "$(SYMROOT)";
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.bps.utitool;
@@ -284,13 +292,13 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 26;
+				CURRENT_PROJECT_VERSION = 27;
 				DEAD_CODE_STRIPPING = YES;
 				DSTROOT = $SRCROOT/build/pkgroot;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/utitool/Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 11.5;
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				OBJROOT = "$(SYMROOT)";
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.bps.utitool;

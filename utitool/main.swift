@@ -46,6 +46,14 @@ let BSP: String             = String(UnicodeScalar(8))
 // FROM 1.0.4
 let EXIT_CTRL_C_CODE: Int32 = 130
 let CTRL_C_MSG: String      = "\(BSP)\(BSP)\rutitool interrupted -- halting"
+// FROM 1.2.0
+let CURSOR: String = "/-\\-"
+let HIDE: String = "\u{001B}[?25l"
+let SHOW: String = "\u{001B}[?25h"
+
+
+// MARK: - Global Variables
+var cursorIndex: Int = 0
 
 
 // MARK: - UTI Data Extraction and Output Functions
@@ -67,7 +75,7 @@ func getExtensionData(_ fileExtension: String) -> Int32 {
     }
 
     // Get UTI data from the extension
-    let utiTypes = UTType.types(tag: extn, tagClass: .filenameExtension , conformingTo: nil)
+    let utiTypes = UTType.types(tag: extn, tagClass: .filenameExtension , conformsingTo: nil)
     if utiTypes.count > 0 {
         writeToStderr("\(BOLD)UTI information for file extension \(YELLOW).\(extn):\(RESET)")
         for (index, utiType) in utiTypes.enumerated() {
@@ -210,6 +218,178 @@ func outputDescription(_ utiType: UTType) {
 }
 
 
+// MARK: - LaunchServices Handling Functions
+
+func readLaunchServicesRegister(_ listByApp: Bool = false) {
+
+    /*
+     --------------------------------------------------------------------------------
+     type id:                    com.apple.realitycomposerpro (0x343d0)
+     bundle:                     Reality Composer Pro (0x62c4)
+     uti:                        com.apple.realitycomposerpro
+     localizedDescription:       "Base" = ?, "en" = ?, "LSDefaultLocalizedValue" = "Reality Composer Pro Swift Package"
+     flags:                      active  apple-internal  exported  trusted (0000000000000055)
+     icons:                      0 values (272384 (0x42800))
+                                 {
+                                 }
+     conforms to:                com.apple.package, public.composite-content, public.directory, public.item
+     tags:                       .realitycomposerpro, application/octet-stream
+     */
+
+    let cursorTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { time in
+        let idx = CURSOR.index(CURSOR.startIndex, offsetBy: cursorIndex)
+        write(message: "\(CURSOR[idx])\(BSP)", to: STD_OUT)
+        cursorIndex = (cursorIndex + 1) % CURSOR.count
+    }
+
+    write(message: "\(HIDE)", to: STD_OUT)
+    let prefix = "type id:"
+    let data = runProcess(app: "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister", with: ["-dump"])
+
+    // TODO Check `data` for error conditions
+
+    var scanned: String? = nil
+    let scanner: Scanner = Scanner(string: data)
+    var utis: [UtiRecord] = []
+    scanner.charactersToBeSkipped = nil
+
+    // Scan up to the first record
+    scanned = scanner.scanUpToString(prefix)
+
+    // Scan for UTI records
+    while !scanner.isAtEnd {
+        // Scan up to the next token delimiter
+        scanned = scanner.scanUpToString(prefix)
+        if let content = scanned, !content.isEmpty {
+            var newRecord: UtiRecord? = nil
+            let lines = content.components(separatedBy: "\n")
+
+            if lines.count > 1 {
+                for line in lines {
+                    let parts = line.components(separatedBy: ":")
+                    let key = parts[0].trimmingCharacters(in: .whitespacesAndNewlines)
+                    let value = parts.count > 1 ? parts[1].trimmingCharacters(in: .whitespacesAndNewlines) : ""
+
+                    switch key {
+                        case "ype id":
+                            let bits = value.components(separatedBy: " ")
+                            newRecord = UtiRecord()
+                            newRecord!.typeId = bits[0]
+                        case "bundle":
+                            let bits = value.components(separatedBy: " (")
+                            if bits[0] != "CoreTypes" {
+                                newRecord?.app = bits[0]
+                            }
+                        case "conforms to":
+                            let bits = value.components(separatedBy: ", ")
+                            if bits.count > 0 {
+                                newRecord?.conforms.append(contentsOf: bits)
+                            }
+                        case "tags":
+                            let bits = value.components(separatedBy: ", ")
+                            if bits.count > 0 {
+                                for bit in bits {
+                                    if bit.hasPrefix(".") {
+                                        newRecord?.ext.append(bit)
+                                    } else {
+                                        newRecord?.mime.append(bit)
+                                    }
+                                }
+
+                            }
+                        default:
+                            break
+                    }
+                }
+
+                if newRecord != nil && newRecord!.app != "" {
+                    if utis.count > 0 {
+                        var doAdd = true
+                        for uti in utis {
+                            if uti.typeId == newRecord!.typeId && uti.app == newRecord!.app {
+                                doAdd = false
+                                break
+                            }
+                        }
+
+                        if doAdd {
+                            utis.append(newRecord!)
+                        }
+                    } else {
+                        utis.append(newRecord!)
+                    }
+                }
+            }
+        } else {
+            scanner.skipNextCharacter()
+        }
+
+        scanned = nil
+    }
+
+    if listByApp {
+        utis = utis.sorted(by: { (a, b) -> Bool in
+            return (a.app < b.app)
+        })
+    } else {
+        utis = utis.sorted(by: { (a, b) -> Bool in
+            return (a.typeId < b.typeId)
+        })
+    }
+
+    if utis.count > 0 {
+        var currentKey: String = ""
+        for uti in utis {
+            if listByApp {
+                if uti.app != currentKey {
+                    currentKey = uti.app
+                    writeToStdout("App \(uti.app) handles these UTIs:")
+                }
+
+                print("  \(uti.typeId)")
+            } else {
+                if uti.typeId != currentKey {
+                    currentKey = uti.typeId
+                    writeToStdout("UTI \(uti.typeId)")
+                    if !uti.ext.isEmpty {
+                        writeToStdout("  File extensions: \(listify(uti.ext))")
+                    }
+
+                    if !uti.mime.isEmpty {
+                        writeToStdout("  Mime types: \(listify(uti.mime))")
+                    }
+
+                    if !uti.conforms.isEmpty {
+                        writeToStdout("  conformss to: \(listify(uti.conforms))")
+                    }
+
+                    writeToStdout("UTI \(uti.typeId) is claimed by these apps:")
+                }
+
+                print("  \(uti.app)")
+            }
+        }
+    } else {
+        reportError("Nothing to show")
+    }
+
+    cursorTimer.invalidate()
+    write(message:"\(BSP)", to: STD_OUT)
+    write(message: "\(SHOW)", to: STD_OUT)
+}
+
+
+func listify(_ items: [String]) -> String {
+
+    var text: String = ""
+    for item in items {
+        text += item + ", "
+    }
+
+    return String(text[...].dropLast(2))
+}
+
+
 // MARK: - Path Processing Functions
 
 func getFullPath(_ relativePath: String) -> String {
@@ -271,7 +451,7 @@ func writeToStderr(_ message: String) {
 
     // Write errors and other messages to stderr
 
-    write(message: message, to: STD_ERR)
+    writeln(message: message, to: STD_ERR)
 }
 
 
@@ -279,15 +459,25 @@ func writeToStdout(_ message: String) {
 
     // Write errors and other messages to stderr
 
-    write(message: message, to: STD_OUT)
+    writeln(message: message, to: STD_OUT)
+}
+
+
+func writeln(message text: String, to fileHandle: FileHandle) {
+
+    // Write text to the specified channel
+    
+    if let textAsData: Data = (text  + "\r\n").data(using: .utf8) {
+        fileHandle.write(textAsData)
+    }
 }
 
 
 func write(message text: String, to fileHandle: FileHandle) {
-    
+
     // Write text to the specified channel
-    
-    if let textAsData: Data = (text  + "\r\n").data(using: .utf8) {
+
+    if let textAsData: Data = (text).data(using: .utf8) {
         fileHandle.write(textAsData)
     }
 }
@@ -399,6 +589,10 @@ if args.count == 1 {
                     argType = 2
                 case "--more", "-m":
                     showMoreInfo = true
+                case "--list", "-l":
+                    readLaunchServicesRegister()
+                case "--apps", "-a":
+                    readLaunchServicesRegister(true)
                 case "-h":
                     fallthrough
                 case "-help":

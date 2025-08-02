@@ -57,6 +57,10 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "-u com.apple.notes.inlinetextattachment.mention"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "-i net.zest.fart"
             isEnabled = "NO">
          </CommandLineArgument>
@@ -82,6 +86,10 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/Users/smitty/GitHub/RP2040-FreeRTOS/deploy.sh /Users/smitty/GitHub/RingCLI2/main.go"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-l"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
