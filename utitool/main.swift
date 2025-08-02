@@ -75,7 +75,7 @@ func getExtensionData(_ fileExtension: String) -> Int32 {
     }
 
     // Get UTI data from the extension
-    let utiTypes = UTType.types(tag: extn, tagClass: .filenameExtension , conformsingTo: nil)
+    let utiTypes = UTType.types(tag: extn, tagClass: .filenameExtension , conformingTo: nil)
     if utiTypes.count > 0 {
         writeToStderr("\(BOLD)UTI information for file extension \(YELLOW).\(extn):\(RESET)")
         for (index, utiType) in utiTypes.enumerated() {
