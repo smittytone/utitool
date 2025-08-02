@@ -8,7 +8,7 @@ For more details, [see here](https://smittytone.net/utitool/index.html).
 
 ## Release Notes ##
 
-- 1.1.0 *Unreleased*
+- 1.1.0 *1 August 2025*
     - Add extra file information.
     - Add `--extension` option to show info about specified a file extension.
     - Add `--uti` option to show info about a specified UTI.
