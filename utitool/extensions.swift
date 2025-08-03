@@ -105,4 +105,20 @@ extension Scanner {
 
         self.currentIndex = self.string.index(after: self.currentIndex)
     }
+
+
+    /**
+     Step over the next x characters.
+
+     - Parameters
+        count: The number of characters to skip
+     */
+    func skipCharacters(_ count: Int) {
+
+        if let idx = self.string.index(self.currentIndex, offsetBy: count, limitedBy: self.string.endIndex) {
+            self.currentIndex = self.string.index(after: idx)
+        } else {
+            self.currentIndex = self.string.endIndex
+        }
+    }
 }

@@ -27,10 +27,20 @@
 import Foundation
 
 
-struct UtiRecord {
-    var typeId: String = ""
-    var app: String = ""
-    var ext: [String] = []
-    var mime: [String] = []
-    var conforms: [String] = []
+/*
+ App Record - an epp capable of handling a given UTI.
+ This is implemented as a struct so we have room to accommodate
+ future properties.
+ */
+struct AppRecord: Encodable {
+    var name: String = ""
+}
+
+
+struct UtiRecord: Encodable {
+    var uti: String = ""
+    var apps: [AppRecord] = []
+    var extensions: [String] = []
+    var mimeTypes: [String] = []
+    var parents: [String] = []
 }

@@ -26,7 +26,6 @@
 
 
 import Foundation
-// FROM 1.0.3 -- Use macOS 11's UTI library
 import UniformTypeIdentifiers
 
 
@@ -54,6 +53,8 @@ let SHOW: String = "\u{001B}[?25h"
 
 // MARK: - Global Variables
 var cursorIndex: Int = 0
+var doOutputJson: Bool = false
+var showMoreInfo:Bool = false
 
 
 // MARK: - UTI Data Extraction and Output Functions
@@ -230,110 +231,201 @@ func readLaunchServicesRegister(_ listByApp: Bool = false) {
      localizedDescription:       "Base" = ?, "en" = ?, "LSDefaultLocalizedValue" = "Reality Composer Pro Swift Package"
      flags:                      active  apple-internal  exported  trusted (0000000000000055)
      icons:                      0 values (272384 (0x42800))
-                                 {
-                                 }
+     {
+     }
      conforms to:                com.apple.package, public.composite-content, public.directory, public.item
      tags:                       .realitycomposerpro, application/octet-stream
      */
 
+    // Set up and start the activity display timer
     let cursorTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { time in
-        let idx = CURSOR.index(CURSOR.startIndex, offsetBy: cursorIndex)
-        write(message: "\(CURSOR[idx])\(BSP)", to: STD_OUT)
-        cursorIndex = (cursorIndex + 1) % CURSOR.count
+        write(message: ".", to: STD_ERR)
     }
 
-    write(message: "\(HIDE)", to: STD_OUT)
-    let prefix = "type id:"
+    let prefix = "type id"
+    let separator = ":"
+    let recordDelimiter = "--------------------------------------------------------------------------------"
     let data = runProcess(app: "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister", with: ["-dump"])
-
     // TODO Check `data` for error conditions
 
+    var utis: [String: UtiRecord] = [:]
+    var apps: [String: ]
+
+    var locale: String.Index = prefix.startIndex
     var scanned: String? = nil
     let scanner: Scanner = Scanner(string: data)
-    var utis: [UtiRecord] = []
     scanner.charactersToBeSkipped = nil
-
-    // Scan up to the first record
-    scanned = scanner.scanUpToString(prefix)
 
     // Scan for UTI records
     while !scanner.isAtEnd {
-        // Scan up to the next token delimiter
-        scanned = scanner.scanUpToString(prefix)
+        // Here we're at the start of a record
+        locale = scanner.currentIndex
+        scanned = scanner.scanUpToString(separator)
+
         if let content = scanned, !content.isEmpty {
-            var newRecord: UtiRecord? = nil
-            let lines = content.components(separatedBy: "\n")
+            if content.trimmingCharacters(in: .whitespaces) != prefix {
+                // Scan to start of next record
+                _ = scanner.scanUpToString(recordDelimiter)
+                scanner.skipCharacters(recordDelimiter.count)
+                continue
+            }
 
-            if lines.count > 1 {
-                for line in lines {
-                    let parts = line.components(separatedBy: ":")
-                    let key = parts[0].trimmingCharacters(in: .whitespacesAndNewlines)
-                    let value = parts.count > 1 ? parts[1].trimmingCharacters(in: .whitespacesAndNewlines) : ""
+            // Step back to the start of the record
+            scanner.currentIndex = locale
 
-                    switch key {
-                        case "ype id":
-                            let bits = value.components(separatedBy: " ")
-                            newRecord = UtiRecord()
-                            newRecord!.typeId = bits[0]
-                        case "bundle":
-                            let bits = value.components(separatedBy: " (")
-                            if bits[0] != "CoreTypes" {
-                                newRecord?.app = bits[0]
-                            }
-                        case "conforms to":
-                            let bits = value.components(separatedBy: ", ")
-                            if bits.count > 0 {
-                                newRecord?.conforms.append(contentsOf: bits)
-                            }
-                        case "tags":
-                            let bits = value.components(separatedBy: ", ")
-                            if bits.count > 0 {
-                                for bit in bits {
-                                    if bit.hasPrefix(".") {
-                                        newRecord?.ext.append(bit)
+            // Get the record and move the index to the next one
+            scanned = scanner.scanUpToString(recordDelimiter)
+            scanner.skipCharacters(recordDelimiter.count)
+
+            if let record = scanned, !record.isEmpty {
+                var newRecord: UtiRecord? = nil
+                let lines = record.components(separatedBy: "\n")
+                if lines.count > 1 {
+                    // Process the record line by line
+                    for line in lines {
+                        let parts = line.components(separatedBy: separator)
+                        if parts.count > 1 {
+                            let key = parts[0].trimmingCharacters(in: .whitespacesAndNewlines)
+                            let value = parts.count > 1 ? parts[1].trimmingCharacters(in: .whitespacesAndNewlines) : ""
+                            switch key {
+                                case "type id":
+                                    let bits = value.components(separatedBy: " ")
+                                    newRecord = UtiRecord()
+                                    newRecord!.uti = bits[0]
+                                case "bundle":
+                                    let bits = value.components(separatedBy: " (")
+                                    if bits[0] != "CoreTypes" {
+                                        var appRecord = AppRecord()
+                                        appRecord.name = bits[0]
+                                        newRecord!.apps.append(appRecord)
                                     } else {
-                                        newRecord?.mime.append(bit)
+                                        // This is a very crude method to wean out hardware UTIs
+                                        newRecord = nil
+                                    }
+                                case "conforms to":
+                                    let bits = value.components(separatedBy: ", ")
+                                    if bits.count > 0 && newRecord != nil {
+                                        newRecord!.parents.append(contentsOf: bits)
+                                    }
+                                case "tags":
+                                    let bits = value.components(separatedBy: ", ")
+                                    if bits.count > 0 && newRecord != nil {
+                                        for bit in bits {
+                                            if bit.hasPrefix(".") {
+                                                newRecord!.extensions.append(bit)
+                                            } else {
+                                                newRecord!.mimeTypes.append(bit)
+                                            }
+                                        }
+
+                                    }
+                                default:
+                                    break
+                            }
+                        }
+                    }
+
+                    if let utiRecord = newRecord {
+                        if utis[utiRecord.uti] == nil {
+                            utis[utiRecord.uti] = utiRecord
+                        } else {
+                            // Got it - add the parts with dedupe
+                            for appRecord1 in utiRecord.apps {
+                                var got: Bool = false
+                                for appRecord2 in utis[utiRecord.uti]!.apps {
+                                    if appRecord2.name == appRecord1.name {
+                                        got = true
+                                        break
                                     }
                                 }
 
+                                if !got {
+                                    utis[utiRecord.uti]!.apps.append(appRecord1)
+                                }
                             }
-                        default:
-                            break
-                    }
-                }
 
-                if newRecord != nil && newRecord!.app != "" {
-                    if utis.count > 0 {
-                        var doAdd = true
-                        for uti in utis {
-                            if uti.typeId == newRecord!.typeId && uti.app == newRecord!.app {
-                                doAdd = false
-                                break
-                            }
+                            utis[utiRecord.uti]!.extensions = dedupeStrings(utiRecord.extensions, utis[utiRecord.uti]!.extensions)
+                            utis[utiRecord.uti]!.mimeTypes = dedupeStrings(utiRecord.mimeTypes, utis[utiRecord.uti]!.mimeTypes)
                         }
-
-                        if doAdd {
-                            utis.append(newRecord!)
-                        }
-                    } else {
-                        utis.append(newRecord!)
                     }
                 }
             }
-        } else {
-            scanner.skipNextCharacter()
         }
-
-        scanned = nil
     }
 
+    cursorTimer.invalidate()
+    write(message:"\r", to: STD_ERR)
+
+    if doOutputJson {
+        do {
+            let jsonEncoder = JSONEncoder()
+            jsonEncoder.outputFormatting = .sortedKeys
+            let outputData = try jsonEncoder.encode(utis)
+            if let output = String(data: outputData, encoding: .utf8) {
+                writeToStdout(output)
+            } else {
+                throw NSError()
+            }
+        } catch  {
+            reportErrorAndExit("Could not process Launch Services to JSON")
+        }
+    } else {
+        var currentKey = ""
+        for (uti, utiRecord) in utis {
+            if listByApp {
+                /*
+                if uti.app != currentKey {
+                    currentKey = uti.app
+                    writeToStdout("App \(uti.app) handles these UTIs:")
+                }
+
+                print("  \(uti.typeId)")
+                 */
+            } else {
+                if uti != currentKey {
+                    currentKey = uti
+                    writeToStdout("\(YELLOW)\(BOLD)\(uti)\(RESET)")
+                    if !utiRecord.extensions.isEmpty {
+                        writeToStdout("  File extensions: \(listify(utiRecord.extensions))")
+                    }
+
+                    if !utiRecord.mimeTypes.isEmpty {
+                        writeToStdout("  Mime types: \(listify(utiRecord.mimeTypes))")
+                    }
+
+                    if !utiRecord.parents.isEmpty {
+                        writeToStdout("  Conforms to: \(listify(utiRecord.parents))")
+                    }
+
+                    var apps: [String] = []
+                    for appRecord in utiRecord.apps {
+                        apps.append(appRecord.name)
+                    }
+
+                    if !apps.isEmpty {
+                        writeToStdout("  Claimed by: \(listify(apps))")
+                    } else {
+                        writeToStdout("  Claimed by no apps")
+                    }
+                }
+            }
+        }
+    }
+
+    return
+}
+
+/*
+
+
+    /*
     if listByApp {
-        utis = utis.sorted(by: { (a, b) -> Bool in
+        keys = keys.sorted(by: { (a, b) -> Bool in
             return (a.app < b.app)
         })
     } else {
-        utis = utis.sorted(by: { (a, b) -> Bool in
-            return (a.typeId < b.typeId)
+        keys = keys.sorted(by: { (a, b) -> Bool in
+            return (a < b)
         })
     }
 
@@ -373,9 +465,39 @@ func readLaunchServicesRegister(_ listByApp: Bool = false) {
         reportError("Nothing to show")
     }
 
+    */
+
     cursorTimer.invalidate()
     write(message:"\(BSP)", to: STD_OUT)
     write(message: "\(SHOW)", to: STD_OUT)
+
+    do {
+        let outputData: Data = try JSONSerialization.data(withJSONObject: utis)
+        writeToStdout("\(outputData)")
+    } catch {
+        reportErrorAndExit("Could not process Launch Services data")
+    }
+}
+*/
+
+
+func dedupeStrings(_ source: [String], _ dest: [String]) -> [String] {
+
+    var updatedDest: [String] = dest
+    var modified: Bool = false
+    for item in source {
+        var got: Bool = false
+        if updatedDest.contains(item) {
+            got = true
+        }
+
+        if !got {
+            updatedDest.append(item)
+            modified = true
+        }
+    }
+
+    return modified ? updatedDest : dest
 }
 
 
@@ -550,10 +672,11 @@ if args.count == 1 {
     var count: UInt = 0
     var argCount: UInt = 0
     var argIsAValue: Bool = false
-    var showMoreInfo:Bool = false
     var prevArg: String = ""
     var argType: Int = -1
     var files: [String] = []
+    var doLaunchServicesReadApps: Bool = false
+    var doLaunchServicesReadUtis: Bool = false
 
     // Process the (separated) arguments
     for argument in args {
@@ -590,9 +713,11 @@ if args.count == 1 {
                 case "--more", "-m":
                     showMoreInfo = true
                 case "--list", "-l":
-                    readLaunchServicesRegister()
+                    doLaunchServicesReadUtis = true
                 case "--apps", "-a":
-                    readLaunchServicesRegister(true)
+                    doLaunchServicesReadApps = true
+                case "--json", "-j":
+                    doOutputJson = true
                 case "-h":
                     fallthrough
                 case "-help":
@@ -617,6 +742,14 @@ if args.count == 1 {
         if argCount == CommandLine.arguments.count && argIsAValue {
             reportErrorAndExit("Missing value for \(argument)")
         }
+    }
+
+    if doLaunchServicesReadApps {
+        readLaunchServicesRegister(true)
+    }
+
+    if doLaunchServicesReadUtis {
+        readLaunchServicesRegister()
     }
 
     // Convert passed paths to URL
@@ -663,7 +796,7 @@ if args.count == 1 {
                 writeToStdout("")
             }
         }
-    } else {
+    } else if !doLaunchServicesReadApps && !doLaunchServicesReadUtis {
         // No reported files? Issue a warning
         report("No files specified or present")
     }
