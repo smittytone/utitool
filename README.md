@@ -6,6 +6,8 @@ It can also be used to reveal information about a specified UTI, or the UTI(s) b
 
 macOS’ Launch Services registry data for UTIs or apps can also be viewed in machine- or human-readable form.
 
+*utitool* requires macOS 11.5 ‘Big Sur’ or above.
+
 For more details, [see here](https://smittytone.net/utitool/index.html).
 
 ## Release Notes ##
