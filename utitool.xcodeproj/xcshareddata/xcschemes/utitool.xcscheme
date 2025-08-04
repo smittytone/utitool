@@ -89,7 +89,11 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-l"
+            argument = "-a  -j"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-h"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
