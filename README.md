@@ -1,13 +1,18 @@
-# utitool 1.1.0
+# utitool 1.2.0
 
 *utitool* is a macOS command line tool you can use to reveal a file’s Uniform Type Identifier (UTI).
 
 It can also be used to reveal information about a specified UTI, or the UTI(s) bound to a specified file extension.
 
+macOS’ Launch Services registry data for UTIs or apps can also be viewed in machine- or human-readable form.
+
 For more details, [see here](https://smittytone.net/utitool/index.html).
 
 ## Release Notes ##
 
+- 1.2.0 *Unreleased*
+    - Add `--list` and `--app` options to retrieve and display system-recorded information for, respectively, UTIs and apps.
+    - Support machine- or human-readable output for the above commands, with the `--json` switch for the former.
 - 1.1.0 *1 August 2025*
     - Add extra file information.
     - Add `--extension` option to show info about specified a file extension.
