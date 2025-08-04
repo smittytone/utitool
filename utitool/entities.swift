@@ -28,18 +28,49 @@ import Foundation
 
 
 /*
- App Record - an epp capable of handling a given UTI.
+ App Record - data for an app capable of handling zero or more UTIs.
  This is implemented as a struct so we have room to accommodate
  future properties.
  */
 struct AppRecord: Encodable {
     var name: String = ""
+    var utis: [UtiRecordShort] = []
 }
 
 
+/*
+ UTI Record - data for a UTI, including the apps that claim it,
+ file extensions it is bound to, MIME types it is bound to, and
+ the parent UTIs to which it conforms.
+ */
 struct UtiRecord: Encodable {
     var uti: String = ""
     var apps: [AppRecord] = []
+    var extensions: [String] = []
+    var mimeTypes: [String] = []
+    var parents: [String] = []
+
+    /**
+     Provide a simplified version of the UTI Record, ie. one
+     without app data.
+     */
+    func shortVersion() -> UtiRecordShort {
+        var basicRecord = UtiRecordShort()
+        basicRecord.uti = self.uti
+        basicRecord.extensions = self.extensions
+        basicRecord.mimeTypes = self.mimeTypes
+        basicRecord.parents = self.parents
+        return basicRecord
+    }
+}
+
+
+/*
+ Brief UTI Record - data for a UTI, including the file extensions it is bound to,
+ MIME types it is bound to, and the parent UTIs to which it conforms.
+ */
+struct UtiRecordShort: Encodable {
+    var uti: String = ""
     var extensions: [String] = []
     var mimeTypes: [String] = []
     var parents: [String] = []

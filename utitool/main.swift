@@ -45,14 +45,10 @@ let BSP: String             = String(UnicodeScalar(8))
 // FROM 1.0.4
 let EXIT_CTRL_C_CODE: Int32 = 130
 let CTRL_C_MSG: String      = "\(BSP)\(BSP)\rutitool interrupted -- halting"
-// FROM 1.2.0
-let CURSOR: String = "/-\\-"
-let HIDE: String = "\u{001B}[?25l"
-let SHOW: String = "\u{001B}[?25h"
 
 
 // MARK: - Global Variables
-var cursorIndex: Int = 0
+
 var doOutputJson: Bool = false
 var showMoreInfo:Bool = false
 
@@ -62,10 +58,13 @@ var showMoreInfo:Bool = false
 /**
  Using the supplied file extension, extract and display system UTI information.
 
- - Parameters
-    - fileExtension: The specified file extension, minus the dot.
+ The routine checks for a dot prefix on the extension and, if one is present,
+ removes it.
 
- - Returns An app exit code: success (0) or failure (1)
+ - Parameters
+    - fileExtension: The specified file extension.
+
+ - Returns An app exit code: success (0) or failure (1).
  */
 func getExtensionData(_ fileExtension: String) -> Int32 {
 
@@ -107,7 +106,7 @@ func getExtensionData(_ fileExtension: String) -> Int32 {
  - Parameters
     - uti: The specified UTI.
 
- - Returns An app exit code: success (0) or failure (1)
+ - Returns An app exit code: success (0) or failure (1).
  */
 func getUtiData(_ uti: String) -> Int32 {
 
@@ -130,7 +129,7 @@ func getUtiData(_ uti: String) -> Int32 {
 
 
 /**
- Output a UTI's related MIME types.
+ Output to STD ERR a UTI's related MIME types.
 
  - Parameters
     - tags: The specified UTI's tags as a dictionary.
@@ -142,7 +141,7 @@ func outputMimeTypes(_ tags:  [UTTagClass : [String]]) {
 
 
 /**
- Output a UTI's related file extensions.
+ Output to STD ERR a UTI's related file extensions.
 
  - Parameters
     - tags: The specified UTI's tags as a dictionary.
@@ -154,7 +153,7 @@ func outputFileExtensions(_ tags:  [UTTagClass : [String]]) {
 
 
 /**
- Output a UTI's related tags by tag class.
+ Output to STD ERR a UTI's related tags by tag class.
 
  - Parameters
     - tags:     The specified UTI's tags as a dictionary.
@@ -188,7 +187,7 @@ func outputTags(_ tags:  [UTTagClass : [String]], _ tagClass: UTTagClass) {
 
 
 /**
- Output a UTI's registration status.
+ Output to STD ERR a UTI's registration status.
 
  - Parameters
     - utiType: The UTI as a `UTType` instance.
@@ -204,7 +203,7 @@ func outputStatus(_ utiType: UTType) {
 
 
 /**
- Output a UTI's description, if it has one.
+ Output to STD ERR a UTI's description, if it has one.
 
  - Parameters
     - utiType: The UTI as a `UTType` instance.
@@ -219,11 +218,19 @@ func outputDescription(_ utiType: UTType) {
 }
 
 
-// MARK: - LaunchServices Handling Functions
+// MARK: - Launch Services Registry Processing Functions
 
+/**
+ Read `lsregister` dumped output for UIT records and add to a list of UTIs
+ and, if requested, apps claiming those UTIs.
+
+ - Parameters
+    - listByApp: Should we also record apps? Default: false
+ */
 func readLaunchServicesRegister(_ listByApp: Bool = false) {
 
-    /*
+    /* This is a typical record from `lsregister -dump`
+
      --------------------------------------------------------------------------------
      type id:                    com.apple.realitycomposerpro (0x343d0)
      bundle:                     Reality Composer Pro (0x62c4)
@@ -237,21 +244,26 @@ func readLaunchServicesRegister(_ listByApp: Bool = false) {
      tags:                       .realitycomposerpro, application/octet-stream
      */
 
+    // Tell the user what's happening
+    write(message: "Obtaining Launch Services’ registry data", to: STD_ERR)
+
     // Set up and start the activity display timer
     let cursorTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { time in
         write(message: ".", to: STD_ERR)
     }
 
-    let prefix = "type id"
-    let separator = ":"
+    let recordPrefix = "type id"
+    let keyValueSeparator = ":"
     let recordDelimiter = "--------------------------------------------------------------------------------"
+    var utis: [String: UtiRecord] = [:]
+    var apps: [String: AppRecord] = [:]
+
+
+    // Get the data
     let data = runProcess(app: "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister", with: ["-dump"])
     // TODO Check `data` for error conditions
 
-    var utis: [String: UtiRecord] = [:]
-    var apps: [String: ]
-
-    var locale: String.Index = prefix.startIndex
+    var locale: String.Index = recordPrefix.startIndex
     var scanned: String? = nil
     let scanner: Scanner = Scanner(string: data)
     scanner.charactersToBeSkipped = nil
@@ -260,10 +272,10 @@ func readLaunchServicesRegister(_ listByApp: Bool = false) {
     while !scanner.isAtEnd {
         // Here we're at the start of a record
         locale = scanner.currentIndex
-        scanned = scanner.scanUpToString(separator)
+        scanned = scanner.scanUpToString(keyValueSeparator)
 
         if let content = scanned, !content.isEmpty {
-            if content.trimmingCharacters(in: .whitespaces) != prefix {
+            if content.trimmingCharacters(in: .whitespaces) != recordPrefix {
                 // Scan to start of next record
                 _ = scanner.scanUpToString(recordDelimiter)
                 scanner.skipCharacters(recordDelimiter.count)
@@ -283,7 +295,7 @@ func readLaunchServicesRegister(_ listByApp: Bool = false) {
                 if lines.count > 1 {
                     // Process the record line by line
                     for line in lines {
-                        let parts = line.components(separatedBy: separator)
+                        let parts = line.components(separatedBy: keyValueSeparator)
                         if parts.count > 1 {
                             let key = parts[0].trimmingCharacters(in: .whitespacesAndNewlines)
                             let value = parts.count > 1 ? parts[1].trimmingCharacters(in: .whitespacesAndNewlines) : ""
@@ -299,7 +311,8 @@ func readLaunchServicesRegister(_ listByApp: Bool = false) {
                                         appRecord.name = bits[0]
                                         newRecord!.apps.append(appRecord)
                                     } else {
-                                        // This is a very crude method to wean out hardware UTIs
+                                        // This is a very crude method to remove hardware UTIs:
+                                        // `CoreTypes` contains other UTIs
                                         newRecord = nil
                                     }
                                 case "conforms to":
@@ -317,7 +330,6 @@ func readLaunchServicesRegister(_ listByApp: Bool = false) {
                                                 newRecord!.mimeTypes.append(bit)
                                             }
                                         }
-
                                     }
                                 default:
                                     break
@@ -325,22 +337,23 @@ func readLaunchServicesRegister(_ listByApp: Bool = false) {
                         }
                     }
 
+                    // If we have a UTI record, add it to the store
                     if let utiRecord = newRecord {
                         if utis[utiRecord.uti] == nil {
                             utis[utiRecord.uti] = utiRecord
                         } else {
                             // Got it - add the parts with dedupe
-                            for appRecord1 in utiRecord.apps {
+                            for appRecordA in utiRecord.apps {
                                 var got: Bool = false
-                                for appRecord2 in utis[utiRecord.uti]!.apps {
-                                    if appRecord2.name == appRecord1.name {
+                                for appRecordB in utis[utiRecord.uti]!.apps {
+                                    if appRecordA.name == appRecordB.name {
                                         got = true
                                         break
                                     }
                                 }
 
                                 if !got {
-                                    utis[utiRecord.uti]!.apps.append(appRecord1)
+                                    utis[utiRecord.uti]!.apps.append(appRecordA)
                                 }
                             }
 
@@ -353,156 +366,139 @@ func readLaunchServicesRegister(_ listByApp: Bool = false) {
         }
     }
 
+    // If requested, build the app database from the UTI database
+    if listByApp {
+        for (_, utiRecord) in utis {
+            for app in utiRecord.apps {
+                if apps[app.name] == nil {
+                    var ar = AppRecord()
+                    ar.name = app.name
+                    ar.utis.append(utiRecord.shortVersion())
+                    apps[app.name] = ar
+                } else {
+                    apps[app.name]!.utis.append(utiRecord.shortVersion())
+                }
+            }
+        }
+    }
+
+    // Shutdown the timer and clear the line
     cursorTimer.invalidate()
     write(message:"\r", to: STD_ERR)
 
+    // Write out the results
     if doOutputJson {
+        // User has asked for JSON output. This is sent to STD_OUT so it can be piped
+        // to another tool, for example `jq`.
         do {
             let jsonEncoder = JSONEncoder()
             jsonEncoder.outputFormatting = .sortedKeys
-            let outputData = try jsonEncoder.encode(utis)
+
+            var outputData: Data
+            if listByApp {
+                outputData = try jsonEncoder.encode(apps)
+            } else {
+                outputData = try jsonEncoder.encode(utis)
+            }
+
             if let output = String(data: outputData, encoding: .utf8) {
                 writeToStdout(output)
             } else {
                 throw NSError()
             }
         } catch  {
+            // Generic error for all three failures above
             reportErrorAndExit("Could not process Launch Services to JSON")
         }
     } else {
-        var currentKey = ""
-        for (uti, utiRecord) in utis {
-            if listByApp {
-                /*
-                if uti.app != currentKey {
-                    currentKey = uti.app
-                    writeToStdout("App \(uti.app) handles these UTIs:")
+        // User has not asked for JSON output, so provide human-readable text
+        // according to the type of data the user wants
+        if listByApp {
+            for (app, appRecord) in apps {
+                writeToStdout("\(YELLOW)\(BOLD)\(app)\(RESET) is associated with the following UTIs:")
+                if !appRecord.utis.isEmpty {
+                    for uti in appRecord.utis {
+                        writeToStdout("  \((uti.uti))")
+                    }
+                }
+            }
+        } else {
+            for (uti, utiRecord) in utis {
+                writeToStdout("\(YELLOW)\(BOLD)\(uti)\(RESET)")
+                if !utiRecord.extensions.isEmpty {
+                    writeToStdout("  File extension\(utiRecord.extensions.count == 1 ? "" : "s"): \(listify(utiRecord.extensions))")
                 }
 
-                print("  \(uti.typeId)")
-                 */
-            } else {
-                if uti != currentKey {
-                    currentKey = uti
-                    writeToStdout("\(YELLOW)\(BOLD)\(uti)\(RESET)")
-                    if !utiRecord.extensions.isEmpty {
-                        writeToStdout("  File extensions: \(listify(utiRecord.extensions))")
-                    }
+                if !utiRecord.mimeTypes.isEmpty {
+                    writeToStdout("  Mime type\(utiRecord.mimeTypes.count == 1 ? "" : "s"): \(listify(utiRecord.mimeTypes))")
+                }
 
-                    if !utiRecord.mimeTypes.isEmpty {
-                        writeToStdout("  Mime types: \(listify(utiRecord.mimeTypes))")
-                    }
+                if !utiRecord.parents.isEmpty {
+                    writeToStdout("  Conforms to: \(listify(utiRecord.parents))")
+                }
 
-                    if !utiRecord.parents.isEmpty {
-                        writeToStdout("  Conforms to: \(listify(utiRecord.parents))")
-                    }
+                var apps: [String] = []
+                for appRecord in utiRecord.apps {
+                    apps.append(appRecord.name)
+                }
 
-                    var apps: [String] = []
-                    for appRecord in utiRecord.apps {
-                        apps.append(appRecord.name)
-                    }
-
-                    if !apps.isEmpty {
-                        writeToStdout("  Claimed by: \(listify(apps))")
-                    } else {
-                        writeToStdout("  Claimed by no apps")
-                    }
+                if !apps.isEmpty {
+                    writeToStdout("  Claimed by: \(listify(apps))")
+                } else {
+                    writeToStdout("  Claimed by no apps")
                 }
             }
         }
     }
-
-    return
 }
 
-/*
 
+/**
+ Generate an array of strings by adding only those members of one array
+ that are not present in a second array to the second array.
 
-    /*
-    if listByApp {
-        keys = keys.sorted(by: { (a, b) -> Bool in
-            return (a.app < b.app)
-        })
-    } else {
-        keys = keys.sorted(by: { (a, b) -> Bool in
-            return (a < b)
-        })
-    }
+ - Parameters
+    arrayA: An array of strings.
+    arrayB: The array into which the new, unique members are to be added.
 
-    if utis.count > 0 {
-        var currentKey: String = ""
-        for uti in utis {
-            if listByApp {
-                if uti.app != currentKey {
-                    currentKey = uti.app
-                    writeToStdout("App \(uti.app) handles these UTIs:")
-                }
+ - Returns The combined array,
+ */
+func dedupeStrings(_ arrayA: [String], _ arrayB: [String]) -> [String] {
 
-                print("  \(uti.typeId)")
-            } else {
-                if uti.typeId != currentKey {
-                    currentKey = uti.typeId
-                    writeToStdout("UTI \(uti.typeId)")
-                    if !uti.ext.isEmpty {
-                        writeToStdout("  File extensions: \(listify(uti.ext))")
-                    }
-
-                    if !uti.mime.isEmpty {
-                        writeToStdout("  Mime types: \(listify(uti.mime))")
-                    }
-
-                    if !uti.conforms.isEmpty {
-                        writeToStdout("  conformss to: \(listify(uti.conforms))")
-                    }
-
-                    writeToStdout("UTI \(uti.typeId) is claimed by these apps:")
-                }
-
-                print("  \(uti.app)")
-            }
-        }
-    } else {
-        reportError("Nothing to show")
-    }
-
-    */
-
-    cursorTimer.invalidate()
-    write(message:"\(BSP)", to: STD_OUT)
-    write(message: "\(SHOW)", to: STD_OUT)
-
-    do {
-        let outputData: Data = try JSONSerialization.data(withJSONObject: utis)
-        writeToStdout("\(outputData)")
-    } catch {
-        reportErrorAndExit("Could not process Launch Services data")
-    }
-}
-*/
-
-
-func dedupeStrings(_ source: [String], _ dest: [String]) -> [String] {
-
-    var updatedDest: [String] = dest
+    var arrayC: [String] = arrayB
     var modified: Bool = false
-    for item in source {
+    for item in arrayA {
         var got: Bool = false
-        if updatedDest.contains(item) {
+        if arrayC.contains(item) {
             got = true
         }
 
         if !got {
-            updatedDest.append(item)
+            arrayC.append(item)
             modified = true
         }
     }
 
-    return modified ? updatedDest : dest
+    return modified ? arrayC : arrayB
 }
 
 
+/**
+ Generate a human-readable list of comma-separated strings from
+ an array of strings.
+
+ - Parameters
+    items: The source array.
+
+ - Returns A comma-separated list.
+
+ */
 func listify(_ items: [String]) -> String {
 
+    if items.isEmpty {
+        return ""
+    }
+    
     var text: String = ""
     for item in items {
         text += item + ", "
@@ -514,9 +510,15 @@ func listify(_ items: [String]) -> String {
 
 // MARK: - Path Processing Functions
 
-func getFullPath(_ relativePath: String) -> String {
+/**
+ Convert a partial path to an absolute path.
 
-    // Convert a partial path to an absolute path
+ - Parameters
+    - relativePath: The partial path.
+
+ - Returns The generated absolute path.
+ */
+func getFullPath(_ relativePath: String) -> String {
 
     // Standardise the path as best as we can (this covers most cases)
     var absolutePath: String = (relativePath as NSString).standardizingPath
@@ -532,10 +534,15 @@ func getFullPath(_ relativePath: String) -> String {
 }
 
 
-func processRelativePath(_ relativePath: String) -> String {
+/**
+ Add the the current working directory to the supplied relative path - and then resolve it.
 
-    // Add the basepath (the current working directory of the call) to the
-    // supplied relative path - and then resolve it
+ - Parameters
+    - relativePath: The partial path.
+
+ - Returns The generated absolute path.
+ */
+func processRelativePath(_ relativePath: String) -> String {
 
     let absolutePath = FileManager.default.currentDirectoryPath + "/" + relativePath
     return (absolutePath as NSString).standardizingPath
@@ -544,60 +551,67 @@ func processRelativePath(_ relativePath: String) -> String {
 
 // MARK: - STDIO Functions
 
+/**
+ Generic message display routine.
+ */
 func report(_ message: String) {
-
-    // Generic message display routine
 
     writeToStderr(message)
 }
 
 
+/**
+ Generic error display routine, but do not exit.
+ */
 func reportError(_ message: String) {
-
-    // Generic error display routine, but do not exit
 
     writeToStderr(RED + BOLD + "ERROR" + RESET + " " + message)
 }
 
 
+/**
+ Generic error display routine, exiting the app after displaying the message.
+ */
 func reportErrorAndExit(_ message: String, _ code: Int32 = EXIT_FAILURE) {
-
-    // Generic error display routine, quitting the app after
 
     writeToStderr(RED + BOLD + "ERROR " + RESET + message + " -- exiting")
     exit(code)
 }
 
 
+/**
+ Write errors and other messages to STD ERR with a line break.
+ */
 func writeToStderr(_ message: String) {
-
-    // Write errors and other messages to stderr
 
     writeln(message: message, to: STD_ERR)
 }
 
 
+/**
+ Write errors and other messages to STD OUT with a line break.
+ */
 func writeToStdout(_ message: String) {
-
-    // Write errors and other messages to stderr
 
     writeln(message: message, to: STD_OUT)
 }
 
 
+/**
+ Write a message to a standard file handle with a line break.
+ */
 func writeln(message text: String, to fileHandle: FileHandle) {
 
-    // Write text to the specified channel
-    
-    if let textAsData: Data = (text  + "\r\n").data(using: .utf8) {
+   if let textAsData: Data = (text  + "\r\n").data(using: .utf8) {
         fileHandle.write(textAsData)
     }
 }
 
 
+/**
+ Write a message to a standard file handle with no line break.
+ */
 func write(message text: String, to fileHandle: FileHandle) {
-
-    // Write text to the specified channel
 
     if let textAsData: Data = (text).data(using: .utf8) {
         fileHandle.write(textAsData)
@@ -607,16 +621,22 @@ func write(message text: String, to fileHandle: FileHandle) {
 
 // MARK: - Help/Info Functions
 
+/**
+ Display help information.
+ */
 func showHelp() {
-
-    // Display the help screen
 
     showHeader()
 
     report("\nA macOS tool to reveal a specified file’s Uniform Type Identifier (UTI).")
-    report("It can also be used to display information about a specific UTI, or a supplied file extension.\r\n")
-    report("\(BOLD)USAGE\(RESET)\n    utitool [-e {extension}] [-u {UTI}] [-m] [path 1] [path 2] ... [path \(ITALIC)n\(RESET)]\r\n")
-    report("\(BOLD)EXAMPLES\(RESET)")
+    report("It can also be used to display information about a specific UTI, or a supplied file extension,")
+    report("and to view what information macOS holds about UTIs and the apps that claim them.\r\n")
+    report("\(BOLD)USAGE\(RESET)\n    utitool [--more] [path 1] [path 2] ... [path \(ITALIC)n\(RESET)]    View specific files’ UTIs.")
+    report("            [--uti [UTI]]                                    View data for a specific UTI.")
+    report("            [--extension {file extension}]                   View data for a specific file extension.")
+    report("            [--list] [--json]                                List system UTI data, with optional JSON output.")
+    report("            [--apps] [--json]                                List system app data, with optional JSON output.")
+    report("\r\n\(BOLD)EXAMPLES\(RESET)")
     report("    utitool *                      -- Get data for all the files in the working directory.")
     report("    utitool text.md                -- Get data for a named file in the working directory.")
     report("    utitool -m text.md             -- Get data for a named file in the working directory and include extra UTI information.")
@@ -625,18 +645,22 @@ func showHelp() {
     report("    utitool ../text1.md            -- Get data for a named file in the parent directory.")
     report("    utitool -e md                  -- Get data about UTIs associated with the file extenions \(ITALIC)md\(RESET).")
     report("    utitool -u com.bps.rust-source -- Get data about UTIs associated with the UTI \(ITALIC)com.bps.rust-source\(RESET).")
-    report("\r\nCopyright © 2025, Tony Smith (@smittytone). Source code available under the MIT licence.")
+    report("    utitool -l                     -- View human-readable UTI information held by macOS.")
+    report("    utitool -a                     -- View human-readable app information held by macOS.")
+    report("    utitool -l -j                  -- Output pipeable UTI information held by macOS in JSON.\n")
 }
 
 
+/**
+ Display the utility's version number
+ */
 func showHeader() {
-
-    // Display the utility's version number
 
     let version: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
     let build: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as! String
     let name:String = Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as! String
     report(BOLD + "\(name) \(version) (\(build))" + RESET)
+    report("Copyright © 2025, Tony Smith (@smittytone). Source code available under the MIT licence.")
 }
 
 
@@ -718,12 +742,11 @@ if args.count == 1 {
                     doLaunchServicesReadApps = true
                 case "--json", "-j":
                     doOutputJson = true
-                case "-h":
-                    fallthrough
-                case "-help":
-                    fallthrough
-                case "--help":
+                case "-h", "-help", "--help":
                     showHelp()
+                    exit(EXIT_SUCCESS)
+                case "--version":
+                    showHeader()
                     exit(EXIT_SUCCESS)
                 default:
                     if argument.prefix(1) == "-" {
