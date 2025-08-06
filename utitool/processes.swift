@@ -39,23 +39,26 @@ import Foundation
     - app:  The location of the app.
     - with: Array of arguments to pass to the app.
 
- - Returns: `true` if the operation was successful, otherwise `false`.
+ - Returns: A tuple containing an error code (or zero for no error) and either
+            the STD OUT output on success, or STD ERR output on error.
  */
-func runProcess(app path: String, with args: [String]) -> String {
+func runProcess(app path: String, with args: [String]) -> (Int32, String) {
 
     let task: Process = Process()
     task.executableURL = URL(fileURLWithPath: path)
     if args.count > 0 { task.arguments = args }
 
     // Pipe out the output to avoid putting it in the log
-    let outputPipe = Pipe()
-    task.standardOutput = outputPipe
-    task.standardError = outputPipe
+    let stdOutPipe = Pipe()
+    let stdErrPipe = Pipe()
+    task.standardOutput = stdOutPipe
+    task.standardError = stdErrPipe
 
     var outputText: String = ""
+    var errorText: String = ""
 
-    let outputHandle = outputPipe.fileHandleForReading
-    outputHandle.readabilityHandler = { fileHandle in
+    let stdOutHandle = stdOutPipe.fileHandleForReading
+    stdOutHandle.readabilityHandler = { fileHandle in
         // If there's available output to the redirected file handle,
         // get it and store it for processing later
         let data = fileHandle.availableData
@@ -66,14 +69,30 @@ func runProcess(app path: String, with args: [String]) -> String {
         }
     }
 
+    let stdErrHandle = stdErrPipe.fileHandleForReading
+    stdErrHandle.readabilityHandler = { fileHandle in
+        // If there's available output to the redirected file handle,
+        // get it and store it for processing later
+        let data = fileHandle.availableData
+        if let output = String(data: data, encoding: .utf8) {
+            DispatchQueue.main.async {
+                errorText += output
+            }
+        }
+    }
+
     do {
         try task.run()
     } catch {
-        return outputText
+        return (1, errorText)
     }
 
     // Block until the task has completed (short tasks ONLY)
     task.waitUntilExit()
 
-    return outputText
+    if task.terminationStatus == 0 {
+        return (0, outputText)
+    }
+
+    return (task.terminationStatus, errorText)
 }

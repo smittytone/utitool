@@ -260,8 +260,12 @@ func readLaunchServicesRegister(_ listByApp: Bool = false) {
 
 
     // Get the data
-    let data = runProcess(app: "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister", with: ["-dump"])
-    // TODO Check `data` for error conditions
+    let (errCode, data) = runProcess(app: "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister", with: ["-dump"])
+
+    // Check `data` for error conditions
+    if errCode != EXIT_SUCCESS {
+        reportErrorAndExit(data, errCode)
+    }
 
     var locale: String.Index = recordPrefix.startIndex
     var scanned: String? = nil
@@ -303,13 +307,18 @@ func readLaunchServicesRegister(_ listByApp: Bool = false) {
                                 case "type id":
                                     let bits = value.components(separatedBy: " ")
                                     newRecord = UtiRecord()
-                                    newRecord!.uti = bits[0]
+                                    newRecord?.uti = bits[0]
                                 case "bundle":
                                     let bits = value.components(separatedBy: " (")
-                                    if bits[0] != "CoreTypes" {
+                                    if bits[0] != "CoreTypes"{
                                         var appRecord = AppRecord()
                                         appRecord.name = bits[0]
-                                        newRecord!.apps.append(appRecord)
+                                        if newRecord == nil {
+                                            newRecord = UtiRecord()
+                                            newRecord?.uti = "UNKNOWN"
+                                        }
+
+                                        newRecord?.apps.append(appRecord)
                                     } else {
                                         // This is a very crude method to remove hardware UTIs:
                                         // `CoreTypes` contains other UTIs
@@ -371,20 +380,16 @@ func readLaunchServicesRegister(_ listByApp: Bool = false) {
         for (_, utiRecord) in utis {
             for app in utiRecord.apps {
                 if apps[app.name] == nil {
-                    var ar = AppRecord()
-                    ar.name = app.name
-                    ar.utis.append(utiRecord.shortVersion())
-                    apps[app.name] = ar
+                    var appRecord = AppRecord()
+                    appRecord.name = app.name
+                    appRecord.utis.append(utiRecord.shortVersion())
+                    apps[app.name] = appRecord
                 } else {
                     apps[app.name]!.utis.append(utiRecord.shortVersion())
                 }
             }
         }
     }
-
-    // Shutdown the timer and clear the line
-    cursorTimer.invalidate()
-    write(message:"\r", to: STD_ERR)
 
     // Write out the results
     if doOutputJson {
@@ -401,6 +406,8 @@ func readLaunchServicesRegister(_ listByApp: Bool = false) {
                 outputData = try jsonEncoder.encode(utis)
             }
 
+            clearTimer(cursorTimer)
+
             if let output = String(data: outputData, encoding: .utf8) {
                 writeToStdout(output)
             } else {
@@ -414,8 +421,14 @@ func readLaunchServicesRegister(_ listByApp: Bool = false) {
         // User has not asked for JSON output, so provide human-readable text
         // according to the type of data the user wants
         if listByApp {
-            for (app, appRecord) in apps {
-                writeToStdout("\(YELLOW)\(BOLD)\(app)\(RESET) is associated with the following UTIs:")
+            // Get a list of alphabetically sorted UTIs from the dictionary
+            let sortedKeys: [String] = Array(apps.keys).sorted { $0 < $1 }
+            clearTimer(cursorTimer)
+
+            // Iterate over that list and output the info
+            for key in sortedKeys {
+                let appRecord = apps[key]!
+                writeToStdout("\(YELLOW)\(BOLD)\(key)\(RESET) is associated with the following UTIs:")
                 if !appRecord.utis.isEmpty {
                     for uti in appRecord.utis {
                         writeToStdout("  \((uti.uti))")
@@ -423,8 +436,14 @@ func readLaunchServicesRegister(_ listByApp: Bool = false) {
                 }
             }
         } else {
-            for (uti, utiRecord) in utis {
-                writeToStdout("\(YELLOW)\(BOLD)\(uti)\(RESET)")
+            // Get a list of alphabetically sorted UTIs from the dictionary
+            let sortedKeys: [String] = Array(utis.keys).sorted { $0 < $1 }
+            clearTimer(cursorTimer)
+
+            // Iterate over that list and output the info
+            for key in sortedKeys {
+                let utiRecord = utis[key]!
+                writeToStdout("\(YELLOW)\(BOLD)\(key)\(RESET)")
                 if !utiRecord.extensions.isEmpty {
                     writeToStdout("  File extension\(utiRecord.extensions.count == 1 ? "" : "s"): \(listify(utiRecord.extensions))")
                 }
@@ -450,6 +469,16 @@ func readLaunchServicesRegister(_ listByApp: Bool = false) {
             }
         }
     }
+}
+
+
+/**
+ Shutdown the timer and clear the line
+ */
+func clearTimer(_ timer: Timer) {
+
+    timer.invalidate()
+    write(message:"\r", to: STD_ERR)
 }
 
 
@@ -632,17 +661,15 @@ func showHelp() {
     report("It can also be used to display information about a specific UTI, or a supplied file extension,")
     report("and to view what information macOS holds about UTIs and the apps that claim them.\r\n")
     report("\(BOLD)USAGE\(RESET)\n    utitool [--more] [path 1] [path 2] ... [path \(ITALIC)n\(RESET)]    View specific files’ UTIs.")
-    report("            [--uti [UTI]]                                    View data for a specific UTI.")
-    report("            [--extension {file extension}]                   View data for a specific file extension.")
-    report("            [--list] [--json]                                List system UTI data, with optional JSON output.")
-    report("            [--apps] [--json]                                List system app data, with optional JSON output.")
+    report("            [--uti [UTI]]                              View data for a specific UTI.")
+    report("            [--extension {file extension}]             View data for a specific file extension.")
+    report("            [--list] [--json]                          List system UTI data, with optional JSON output.")
+    report("            [--apps] [--json]                          List system app data, with optional JSON output.")
     report("\r\n\(BOLD)EXAMPLES\(RESET)")
-    report("    utitool *                      -- Get data for all the files in the working directory.")
-    report("    utitool text.md                -- Get data for a named file in the working directory.")
-    report("    utitool -m text.md             -- Get data for a named file in the working directory and include extra UTI information.")
-    report("    utitool text1.md text2.md      -- Get data for named files in the working directory.")
-    report("    utitool /User/me/text1.md      -- Get data for any named file.")
-    report("    utitool ../text1.md            -- Get data for a named file in the parent directory.")
+    report("    utitool text.md                -- Get UTI for a named file in the current directory.")
+    report("    utitool -m text.md             -- Get extended UTI info for a named file in the current directory.")
+    report("    utitool text1.md text2.md      -- Get UTIs for named files in the current directory.")
+    report("    utitool -m *                   -- Get extended UTI info for all the files in the current directory.")
     report("    utitool -e md                  -- Get data about UTIs associated with the file extenions \(ITALIC)md\(RESET).")
     report("    utitool -u com.bps.rust-source -- Get data about UTIs associated with the UTI \(ITALIC)com.bps.rust-source\(RESET).")
     report("    utitool -l                     -- View human-readable UTI information held by macOS.")
