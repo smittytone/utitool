@@ -89,18 +89,18 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-a  -j"
-            isEnabled = "NO">
+            argument = "-a "
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-h"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
       <EnvironmentVariables>
          <EnvironmentVariable
-            key = ""
-            value = ""
+            key = "UTITIOOL_USE_LIGHT"
+            value = "1"
             isEnabled = "YES">
          </EnvironmentVariable>
       </EnvironmentVariables>

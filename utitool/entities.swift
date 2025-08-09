@@ -49,6 +49,7 @@ struct UtiRecord: Encodable {
     var extensions: [String] = []
     var mimeTypes: [String] = []
     var parents: [String] = []
+    var ref: String = ""
 
     /**
      Provide a simplified version of the UTI Record, ie. one

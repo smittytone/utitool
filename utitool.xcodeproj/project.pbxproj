@@ -10,6 +10,9 @@
 		3B42AF142E3CD0A100FF6743 /* extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B42AF132E3CD0A100FF6743 /* extensions.swift */; };
 		3BDDE23F2E3E299800BB8AD4 /* processes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BDDE23E2E3E299800BB8AD4 /* processes.swift */; };
 		3BDDE2412E3E672100BB8AD4 /* entities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BDDE2402E3E672100BB8AD4 /* entities.swift */; };
+		3BEC96B92E47719B00F541D5 /* stdio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BEC96B82E47719B00F541D5 /* stdio.swift */; };
+		3BEC96BB2E4771E100F541D5 /* uti.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BEC96BA2E4771E100F541D5 /* uti.swift */; };
+		3BEC96BD2E47725F00F541D5 /* path.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BEC96BC2E47725F00F541D5 /* path.swift */; };
 		5A5688E825ADFFC4002293E8 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5688E725ADFFC4002293E8 /* main.swift */; };
 /* End PBXBuildFile section */
 
@@ -29,6 +32,9 @@
 		3B42AF132E3CD0A100FF6743 /* extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = extensions.swift; sourceTree = "<group>"; };
 		3BDDE23E2E3E299800BB8AD4 /* processes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = processes.swift; sourceTree = "<group>"; };
 		3BDDE2402E3E672100BB8AD4 /* entities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = entities.swift; sourceTree = "<group>"; };
+		3BEC96B82E47719B00F541D5 /* stdio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = stdio.swift; sourceTree = "<group>"; };
+		3BEC96BA2E4771E100F541D5 /* uti.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = uti.swift; sourceTree = "<group>"; };
+		3BEC96BC2E47725F00F541D5 /* path.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = path.swift; sourceTree = "<group>"; };
 		5A5688E425ADFFC4002293E8 /* utitool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = utitool; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A5688E725ADFFC4002293E8 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		5A5688EF25AE001C002293E8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -65,6 +71,9 @@
 			isa = PBXGroup;
 			children = (
 				5A5688E725ADFFC4002293E8 /* main.swift */,
+				3BEC96BC2E47725F00F541D5 /* path.swift */,
+				3BEC96BA2E4771E100F541D5 /* uti.swift */,
+				3BEC96B82E47719B00F541D5 /* stdio.swift */,
 				3BDDE2402E3E672100BB8AD4 /* entities.swift */,
 				3B42AF132E3CD0A100FF6743 /* extensions.swift */,
 				3BDDE23E2E3E299800BB8AD4 /* processes.swift */,
@@ -131,10 +140,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3BEC96BB2E4771E100F541D5 /* uti.swift in Sources */,
+				3BEC96B92E47719B00F541D5 /* stdio.swift in Sources */,
 				3BDDE23F2E3E299800BB8AD4 /* processes.swift in Sources */,
 				5A5688E825ADFFC4002293E8 /* main.swift in Sources */,
 				3BDDE2412E3E672100BB8AD4 /* entities.swift in Sources */,
 				3B42AF142E3CD0A100FF6743 /* extensions.swift in Sources */,
+				3BEC96BD2E47725F00F541D5 /* path.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -269,7 +281,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 34;
 				DEAD_CODE_STRIPPING = YES;
 				DSTROOT = $SRCROOT/build/pkgroot;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -292,7 +304,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 32;
+				CURRENT_PROJECT_VERSION = 34;
 				DEAD_CODE_STRIPPING = YES;
 				DSTROOT = $SRCROOT/build/pkgroot;
 				ENABLE_HARDENED_RUNTIME = YES;
