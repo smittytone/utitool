@@ -27,100 +27,109 @@
 import Foundation
 
 
-// MARK: - Constants
-
-let STD_ERR: FileHandle = FileHandle.standardError
-let STD_OUT: FileHandle = FileHandle.standardOutput
-
-// TTY formatting
-let BSP: String             = String(UnicodeScalar(8))
-
+// MARK: - Constant Groupings
 
 struct ShellColours {
 
-    static let Black: String    = "\u{001B}[30m"
-    static let Red: String      = "\u{001B}[31m"
-    static let Green: String    = "\u{001B}[32m"
-    static let Yellow: String   = "\u{001B}[33m"
-    static let Blue: String     = "\u{001B}[34m"
-    static let Magenta: String  = "\u{001B}[35m"
-    static let Cyan: String     = "\u{001B}[36m"
-    static let White: String    = "\u{001B}[37m"
+    static let Black: String        = "\u{001B}[30m"
+    static let Red: String          = "\u{001B}[31m"
+    static let Green: String        = "\u{001B}[32m"
+    static let Yellow: String       = "\u{001B}[33m"
+    static let Blue: String         = "\u{001B}[34m"
+    static let Magenta: String      = "\u{001B}[35m"
+    static let Cyan: String         = "\u{001B}[36m"
+    static let White: String        = "\u{001B}[37m"
 }
 
 
 struct ShellStyle {
 
-    static let Bold: String     = "\u{001B}[1m"
-    static let Italic: String   = "\u{001B}[3m"
-    static let Normal: String   = "\u{001B}[0m"
+    static let Bold: String         = "\u{001B}[1m"
+    static let Italic: String       = "\u{001B}[3m"
+    static let Normal: String       = "\u{001B}[0m"
 }
 
 
-/**
- Generic message display routine.
- */
-func report(_ message: String) {
+struct ShellActions {
 
-    writeToStderr(message)
+    static let Backspace: String    = String(UnicodeScalar(8))
+    static let Clearline: String    = "\u{001B}[2K"
 }
 
 
-/**
- Generic error display routine, but do not exit.
- */
-func reportError(_ message: String) {
+struct ShellRoutes {
 
-    writeToStderr(ShellColours.Red + ShellStyle.Bold + "ERROR" + ShellStyle.Normal + " " + message)
+    static let Error: FileHandle    = FileHandle.standardError
+    static let Ouptut: FileHandle   = FileHandle.standardOutput
 }
 
 
-/**
- Generic error display routine, exiting the app after displaying the message.
- */
-func reportErrorAndExit(_ message: String, _ code: Int32 = EXIT_FAILURE) {
+struct Stdio {
 
-    writeToStderr(ShellColours.Red + ShellStyle.Bold + "ERROR " + ShellStyle.Normal + message + " -- exiting")
-    exit(code)
-}
+    /**
+     Generic message display routine.
+     */
+    static func report(_ message: String) {
 
-
-/**
- Write errors and other messages to STD ERR with a line break.
- */
-func writeToStderr(_ message: String) {
-
-    writeln(message: message, to: STD_ERR)
-}
+        writeToStderr(message)
+    }
 
 
-/**
- Write errors and other messages to STD OUT with a line break.
- */
-func writeToStdout(_ message: String) {
+    /**
+     Generic error display routine, but do not exit.
+     */
+    static func reportError(_ message: String) {
 
-    writeln(message: message, to: STD_OUT)
-}
+        writeToStderr(ShellColours.Red + ShellStyle.Bold + "ERROR" + ShellStyle.Normal + " " + message)
+    }
 
 
-/**
- Write a message to a standard file handle with a line break.
- */
-func writeln(message text: String, to fileHandle: FileHandle) {
+    /**
+     Generic error display routine, exiting the app after displaying the message.
+     */
+    static func reportErrorAndExit(_ message: String, _ code: Int32 = EXIT_FAILURE) {
 
-   if let textAsData: Data = (text  + "\r\n").data(using: .utf8) {
-        fileHandle.write(textAsData)
+        writeToStderr(ShellColours.Red + ShellStyle.Bold + "ERROR " + ShellStyle.Normal + message + " -- exiting")
+        exit(code)
+    }
+
+
+    /**
+     Write errors and other messages to STD ERR with a line break.
+     */
+    static func writeToStderr(_ message: String) {
+
+        writeln(message: message, to: ShellRoutes.Error)
+    }
+
+
+    /**
+     Write errors and other messages to STD OUT with a line break.
+     */
+    static func writeToStdout(_ message: String) {
+
+        writeln(message: message, to: ShellRoutes.Ouptut)
+    }
+
+
+    /**
+     Write a message to a standard file handle with a line break.
+     */
+    static func writeln(message text: String, to fileHandle: FileHandle) {
+
+        if let textAsData: Data = (text  + "\r\n").data(using: .utf8) {
+            fileHandle.write(textAsData)
+        }
+    }
+
+
+    /**
+     Write a message to a standard file handle with no line break.
+     */
+    static func write(message text: String, to fileHandle: FileHandle) {
+
+        if let textAsData: Data = (text).data(using: .utf8) {
+            fileHandle.write(textAsData)
+        }
     }
 }
-
-
-/**
- Write a message to a standard file handle with no line break.
- */
-func write(message text: String, to fileHandle: FileHandle) {
-
-    if let textAsData: Data = (text).data(using: .utf8) {
-        fileHandle.write(textAsData)
-    }
-}
-
