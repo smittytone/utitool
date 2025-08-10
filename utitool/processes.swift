@@ -45,15 +45,13 @@ import Foundation
 func runProcess(app path: String, with args: [String]) -> (Int32, String) {
 
     let task: Process = Process()
+    task.qualityOfService = .userInitiated
     task.executableURL = URL(fileURLWithPath: path)
     if args.count > 0 { task.arguments = args }
 
     // Pipe out the output to avoid putting it in the log
     let stdOutPipe = Pipe()
     let stdErrPipe = Pipe()
-    task.standardOutput = stdOutPipe
-    task.standardError = stdErrPipe
-
     var outputText: String = ""
     var errorText: String = ""
 
@@ -81,6 +79,10 @@ func runProcess(app path: String, with args: [String]) -> (Int32, String) {
         }
     }
 
+    // Hook up the outputs
+    task.standardOutput = stdOutPipe
+    task.standardError = stdErrPipe
+
     do {
         try task.run()
     } catch {
@@ -90,9 +92,16 @@ func runProcess(app path: String, with args: [String]) -> (Int32, String) {
     // Block until the task has completed (short tasks ONLY)
     task.waitUntilExit()
 
+    // Clear the 'data availble' handlers
+    // NOTE This seems to fix grabled data issues
+    stdOutHandle.readabilityHandler = nil
+    stdErrHandle.readabilityHandler = nil
+
+    // Task completed successfully so return the standard output
     if task.terminationStatus == 0 {
         return (0, outputText)
     }
 
+    // Task reported an error, so pass it back with any error message
     return (task.terminationStatus, errorText)
 }
