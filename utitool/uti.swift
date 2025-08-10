@@ -68,7 +68,7 @@ func getExtensionData(_ fileExtension: String) -> Int32 {
                 outputStatus(utiType, inset)
             }
         } else {
-            Stdio.report("\(String(.bold))\(utiTypes[0].identifier)\(String(.normal))")
+            Stdio.report("UTI: \(String(.bold))\(utiTypes[0].identifier)\(String(.normal))")
             outputDescription(utiTypes[0])
 
             if utiTypes[0].tags.count > 0 {
