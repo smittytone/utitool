@@ -58,14 +58,14 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-u com.apple.notes.inlinetextattachment.mention"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "-i net.zest.fart"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-i net.daringfireball.markdown"
+            argument = "-u net.zest.fart"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-u net.daringfireball.markdown"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
@@ -81,7 +81,7 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "/Users/smitty/GitHub/RingCLI2/main.go"
+            argument = "-m /Users/smitty/GitHub/RingCLI2/main.go"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
@@ -90,6 +90,10 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-a"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-l"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
