@@ -31,7 +31,7 @@ import Foundation
 
 // FROM 1.0.4
 let EXIT_CTRL_C_CODE: Int32 = 130
-let CTRL_C_MSG: String      = "\(BSP)\(BSP)\rutitool interrupted -- halting"
+let CTRL_C_MSG: String      = "\(ShellActions.Backspace)\(ShellActions.Backspace)\rutitool interrupted -- halting"
 
 
 // MARK: - Global Variables
@@ -51,7 +51,7 @@ let dss: DispatchSourceSignal = DispatchSource.makeSignalSource(signal: SIGINT,
                                                                 queue: DispatchQueue.main)
 // ...add an event handler (from above)...
 dss.setEventHandler {
-    writeToStderr(CTRL_C_MSG)
+    Stdio.writeToStderr(CTRL_C_MSG)
     exit(EXIT_CTRL_C_CODE)
 }
 
@@ -88,7 +88,7 @@ if args.count == 1 {
         if argIsAValue {
             // Make sure we're not reading in an option rather than a value
             if argument.prefix(1) == "-" {
-                reportErrorAndExit("Missing value for \(prevArg)")
+                Stdio.reportErrorAndExit("Missing value for \(prevArg)")
             }
 
             argIsAValue = false
@@ -125,7 +125,7 @@ if args.count == 1 {
                     exit(EXIT_SUCCESS)
                 default:
                     if argument.prefix(1) == "-" {
-                        reportErrorAndExit("Unknown argument: \(argument)")
+                        Stdio.reportErrorAndExit("Unknown argument: \(argument)")
                     } else {
                         files.append(argument)
                     }
@@ -138,7 +138,7 @@ if args.count == 1 {
 
         // Trap commands that come last and therefore have missing args
         if argCount == CommandLine.arguments.count && argIsAValue {
-            reportErrorAndExit("Missing value for \(argument)")
+            Stdio.reportErrorAndExit("Missing value for \(argument)")
         }
     }
 
@@ -175,28 +175,24 @@ if args.count == 1 {
                     }
 
                     if showMoreInfo {
-                        writeToStdout("UTI for \(path): \(ShellColours.Magenta)\(uti)\(ShellStyle.Normal)")
-                        _ = getUtiData(uti)
+                        Stdio.writeToStdout("UTI for \(ShellColours.Magenta)\(path)\(ShellStyle.Normal) is \(ShellColours.Magenta)\(uti)\(ShellStyle.Normal)")
+                        _ = getUtiData(uti, false)
                     } else {
-                        writeToStdout("UTI for \(path): \(ShellColours.Magenta)\(uti)\(ShellStyle.Normal) (\(extra))")
+                        Stdio.writeToStdout("UTI for \(ShellColours.Magenta)\(path)\(ShellStyle.Normal) is \(ShellColours.Magenta)\(uti)\(ShellStyle.Normal) (\(extra))")
                     }
                 } else {
-                    reportError("Could not get UTI for \(path)")
+                    Stdio.reportError("Could not get UTI for \(path)")
                 }
 
                 // Tally the number of files reported on
                 count += 1
             } else {
-                reportError("\(path) is not a valid file reference")
-            }
-
-            if showMoreInfo {
-                writeToStdout("")
+                Stdio.reportError("\(path) is not a valid file reference")
             }
         }
     } else if !doLaunchServicesReadApps && !doLaunchServicesReadUtis {
         // No reported files? Issue a warning
-        report("No files specified or present")
+        Stdio.report("No files specified or present")
     }
 }
 
@@ -213,24 +209,24 @@ func showHelp() {
 
     showHeader()
 
-    report("\nA macOS tool to reveal a specified file’s Uniform Type Identifier (UTI).")
-    report("It can also be used to display information about a specific UTI, or a supplied file extension,")
-    report("and to view what information macOS holds about UTIs and the apps that claim them.\r\n")
-    report("\(ShellStyle.Bold)USAGE\(ShellStyle.Normal)\n    utitool [--more] [path 1] [path 2] ... [path \(ShellStyle.Italic)n\(ShellStyle.Normal)]    View specific files’ UTIs.")
-    report("            [--uti [UTI]]                              View data for a specific UTI.")
-    report("            [--extension {file extension}]             View data for a specific file extension.")
-    report("            [--list] [--json]                          List system UTI data, with optional JSON output.")
-    report("            [--apps] [--json]                          List system app data, with optional JSON output.")
-    report("\r\n\(ShellStyle.Bold)EXAMPLES\(ShellStyle.Normal)")
-    report("    utitool text.md                     Get UTI for a named file in the current directory.")
-    report("    utitool -m text.md                  Get extended UTI info for a named file in the current directory.")
-    report("    utitool text1.md text2.md           Get UTIs for named files in the current directory.")
-    report("    utitool -m *                        Get extended UTI info for all the files in the current directory.")
-    report("    utitool -e md                       Get data about UTIs associated with the file extenions \(ShellStyle.Italic)md\(ShellStyle.Normal).")
-    report("    utitool -u com.bps.rust-source      Get data about UTIs associated with the UTI \(ShellStyle.Italic)com.bps.rust-source\(ShellStyle.Normal).")
-    report("    utitool -l                          View human-readable UTI information held by macOS.")
-    report("    utitool -a                          View human-readable app information held by macOS.")
-    report("    utitool -l -j                       Output pipeable UTI information held by macOS in JSON.\n")
+    Stdio.report("\nA macOS tool to reveal a specified file’s Uniform Type Identifier (UTI).")
+    Stdio.report("It can also be used to display information about a specific UTI, or a supplied file extension,")
+    Stdio.report("and to view what information macOS holds about UTIs and the apps that claim them.\r\n")
+    Stdio.report("\(ShellStyle.Bold)USAGE\(ShellStyle.Normal)\n    utitool [--more] [path 1] [path 2] ... [path \(ShellStyle.Italic)n\(ShellStyle.Normal)]    View specific files’ UTIs.")
+    Stdio.report("            [--uti [UTI]]                              View data for a specific UTI.")
+    Stdio.report("            [--extension {file extension}]             View data for a specific file extension.")
+    Stdio.report("            [--list] [--json]                          List system UTI data, with optional JSON output.")
+    Stdio.report("            [--apps] [--json]                          List system app data, with optional JSON output.")
+    Stdio.report("\r\n\(ShellStyle.Bold)EXAMPLES\(ShellStyle.Normal)")
+    Stdio.report("    utitool text.md                     Get UTI for a named file in the current directory.")
+    Stdio.report("    utitool -m text.md                  Get extended UTI info for a named file in the current directory.")
+    Stdio.report("    utitool text1.md text2.md           Get UTIs for named files in the current directory.")
+    Stdio.report("    utitool -m *                        Get extended UTI info for all the files in the current directory.")
+    Stdio.report("    utitool -e md                       Get data about UTIs associated with the file extenions \(ShellStyle.Italic)md\(ShellStyle.Normal).")
+    Stdio.report("    utitool -u com.bps.rust-source      Get data about UTIs associated with the UTI \(ShellStyle.Italic)com.bps.rust-source\(ShellStyle.Normal).")
+    Stdio.report("    utitool -l                          View human-readable UTI information held by macOS.")
+    Stdio.report("    utitool -a                          View human-readable app information held by macOS.")
+    Stdio.report("    utitool -l -j                       Output pipeable UTI information held by macOS in JSON.\n")
 }
 
 
@@ -242,6 +238,6 @@ func showHeader() {
     let version: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
     let build: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as! String
     let name:String = Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as! String
-    report("\(ShellStyle.Bold)\(name) \(version) (\(build))\(ShellStyle.Normal)")
-    report("Copyright © 2025, Tony Smith (@smittytone). Source code available under the MIT licence.")
+    Stdio.report("\(ShellStyle.Bold)\(name) \(version) (\(build))\(ShellStyle.Normal)")
+    Stdio.report("Copyright © 2025, Tony Smith (@smittytone). Source code available under the MIT licence.")
 }
