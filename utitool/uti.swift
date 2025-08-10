@@ -52,9 +52,9 @@ func getExtensionData(_ fileExtension: String) -> Int32 {
     // Get UTI data from the extension
     let utiTypes = UTType.types(tag: extn, tagClass: .filenameExtension , conformingTo: nil)
     if utiTypes.count > 0 {
-        writeToStderr("\(ShellStyle.Bold)UTI information for file extension \(ShellColours.Yellow).\(extn):\(ShellStyle.Normal)")
+        Stdio.writeToStderr("\(ShellStyle.Bold)UTI information for file extension \(ShellColours.Yellow).\(extn):\(ShellStyle.Normal)")
         for (index, utiType) in utiTypes.enumerated() {
-            writeToStderr("\(String(format: "%03d", index + 1)) \(ShellStyle.Bold)\(utiType.identifier)\(ShellStyle.Normal)")
+            Stdio.writeToStderr("\(String(format: "%03d", index + 1)) \(ShellStyle.Bold)\(utiType.identifier)\(ShellStyle.Normal)")
             outputDescription(utiType)
 
             if utiType.tags.count > 0 {
@@ -64,11 +64,11 @@ func getExtensionData(_ fileExtension: String) -> Int32 {
             outputStatus(utiType)
 
             if index < utiTypes.count - 1 {
-                writeToStderr("")
+                Stdio.writeToStderr("")
             }
         }
     } else {
-        writeToStderr("No info available for extension .\(extn)")
+        Stdio.writeToStderr("No info available for extension .\(extn)")
     }
 
     return EXIT_SUCCESS
@@ -79,14 +79,17 @@ func getExtensionData(_ fileExtension: String) -> Int32 {
  Using the supplied UTI, extract and display system information.
 
  - Parameters
-    - uti: The specified UTI.
+    - uti:        The specified UTI.
+    - doShowHead: Include the UTI name as a heading.
 
  - Returns An app exit code: success (0) or failure (1).
  */
-func getUtiData(_ uti: String) -> Int32 {
+func getUtiData(_ uti: String, _ doShowHead: Bool = true) -> Int32 {
 
     if let utiType = UTType(uti) {
-        writeToStderr("\(ShellStyle.Bold)Information for UTI \(ShellColours.Yellow).\(utiType.identifier)\(ShellStyle.Normal):")
+        if doShowHead {
+            Stdio.writeToStderr("\(ShellStyle.Bold)Information for UTI \(ShellColours.Yellow)\(utiType.identifier)\(ShellStyle.Normal):")
+        }
         outputDescription(utiType)
 
         if utiType.tags.count > 0 {
@@ -96,7 +99,7 @@ func getUtiData(_ uti: String) -> Int32 {
 
         outputStatus(utiType)
     } else {
-        report("UTI \(ShellStyle.Bold)\(uti)\(ShellStyle.Normal) is not known to the system")
+        Stdio.report("UTI \(ShellStyle.Bold)\(uti)\(ShellStyle.Normal) is not known to the system")
     }
 
     return EXIT_SUCCESS
@@ -151,12 +154,12 @@ func outputTags(_ tags:  [UTTagClass : [String]], _ tagClass: UTTagClass) {
                 items += item + ", "
             }
 
-            writeToStderr("    \(tagText.capitaliseFirst()) registered: \(items.dropLast(2))")
+            Stdio.writeToStderr("\(tagText.capitaliseFirst()) registered: \(items.dropLast(2))")
         } else {
-            writeToStderr("    No \(tagText) registered")
+            Stdio.writeToStderr("No \(tagText) registered")
         }
     } else {
-        writeToStderr("    No \(tagText) registered")
+        Stdio.writeToStderr("No \(tagText) registered")
     }
 }
 
@@ -170,9 +173,9 @@ func outputTags(_ tags:  [UTTagClass : [String]], _ tagClass: UTTagClass) {
 func outputStatus(_ utiType: UTType) {
 
     if utiType.isDeclared {
-        writeToStderr("    UTI is registered with the system")
+        Stdio.writeToStderr("UTI is registered with the system")
     } else if utiType.isDynamic {
-        writeToStderr("    UTI is dynamically assigned")
+        Stdio.writeToStderr("UTI is dynamically assigned")
     }
 }
 
@@ -186,9 +189,9 @@ func outputStatus(_ utiType: UTType) {
 func outputDescription(_ utiType: UTType) {
 
     if let desc = utiType.localizedDescription {
-        writeToStderr("    Content type: \(desc)")
+        Stdio.writeToStderr("Content type: \(desc)")
     } else {
-        writeToStderr("    Content type: \(utiType.debugDescription)")
+        Stdio.writeToStderr("Content type: \(utiType.debugDescription)")
     }
 }
 
@@ -220,11 +223,11 @@ func readLaunchServicesRegister(_ listByApp: Bool = false) {
      */
 
     // Tell the user what's happening
-    write(message: "Obtaining Launch Services’ registry data", to: STD_ERR)
+    Stdio.write(message: "Obtaining Launch Services’ registry data", to: ShellRoutes.Error)
 
     // Set up and start the activity display timer
     let cursorTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { time in
-        write(message: ".", to: STD_ERR)
+        Stdio.write(message: ".", to: ShellRoutes.Error)
     }
 
     let recordPrefix = "type id"
@@ -239,7 +242,7 @@ func readLaunchServicesRegister(_ listByApp: Bool = false) {
 
     // Check `data` for error conditions
     if errCode != EXIT_SUCCESS {
-        reportErrorAndExit(data, errCode)
+        Stdio.reportErrorAndExit(data, errCode)
     }
 
     var locale: String.Index = recordPrefix.startIndex
@@ -290,34 +293,17 @@ func readLaunchServicesRegister(_ listByApp: Bool = false) {
                                     appRecord.name = bits[0]
                                     if newRecord == nil {
                                         newRecord = UtiRecord()
-                                        newRecord?.uti = "UNKNOWN"
+                                        newRecord?.uti = "unknown"
                                     }
 
                                     newRecord?.apps.append(appRecord)
 
                                     if bits[0] == "CoreTypes" {
                                         if ignoreHardware(newRecord!.uti) {
+                                            // Don't include the current UTI
                                             newRecord = nil
                                         }
                                     }
-
-                                    /*
-                                    if bits[0] != "CoreTypes"{
-                                        var appRecord = AppRecord()
-                                        appRecord.name = bits[0]
-                                        if newRecord == nil {
-                                            newRecord = UtiRecord()
-                                            newRecord?.uti = "UNKNOWN"
-                                        }
-
-                                        newRecord?.apps.append(appRecord)
-                                    } else {
-                                        // This is a very crude method to remove hardware UTIs:
-                                        // `CoreTypes` contains other UTIs
-                                        print("**** \(newRecord!.uti)")
-                                        newRecord = nil
-                                    }
-                                     */
                                 case "reference url":
                                     newRecord?.ref = value
                                 case "conforms to":
@@ -331,9 +317,13 @@ func readLaunchServicesRegister(_ listByApp: Bool = false) {
                                         for bit in bits {
                                             if bit.hasPrefix(".") {
                                                 newRecord!.extensions.append(bit)
-                                            } else {
+                                            } else if bit.contains("/") {
                                                 newRecord!.mimeTypes.append(bit)
                                             }
+                                        }
+
+                                        if newRecord!.mimeTypes.count > 10 {
+                                            print("****", newRecord!.uti, "\n", line)
                                         }
                                     }
                                 default:
@@ -405,13 +395,13 @@ func readLaunchServicesRegister(_ listByApp: Bool = false) {
             clearTimer(cursorTimer)
 
             if let output = String(data: outputData, encoding: .utf8) {
-                writeToStdout(output)
+                Stdio.writeToStdout(output)
             } else {
                 throw NSError()
             }
         } catch  {
             // Generic error for all three failures above
-            reportErrorAndExit("Could not process Launch Services to JSON")
+            Stdio.reportErrorAndExit("Could not process Launch Services to JSON")
         }
     } else {
         // User has not asked for JSON output, so provide human-readable text
@@ -424,10 +414,12 @@ func readLaunchServicesRegister(_ listByApp: Bool = false) {
             // Iterate over that list and output the info
             for key in sortedKeys {
                 let appRecord = apps[key]!
-                writeToStdout("\(ShellColours.Yellow)\(ShellStyle.Bold)\(key)\(ShellStyle.Normal) is associated with the following UTIs:")
+                Stdio.writeToStdout("\(ShellColours.Yellow)\(ShellStyle.Bold)\(key)\(ShellStyle.Normal) is associated with the following UTIs:")
                 if !appRecord.utis.isEmpty {
-                    for uti in appRecord.utis {
-                        writeToStdout("  \((uti.uti))")
+                    // Order the subsidiary UTI list
+                    let orderedUtis = appRecord.utis.sorted { $0.uti < $1.uti }
+                    for uti in orderedUtis {
+                        Stdio.writeToStdout("  \((uti.uti))")
                     }
                 }
             }
@@ -439,21 +431,21 @@ func readLaunchServicesRegister(_ listByApp: Bool = false) {
             // Iterate over that list and output the info
             for key in sortedKeys {
                 let utiRecord = utis[key]!
-                writeToStdout("\(ShellColours.Yellow)\(ShellStyle.Bold)\(key)\(ShellStyle.Normal)")
+                Stdio.writeToStdout("\(ShellColours.Yellow)\(ShellStyle.Bold)\(key)\(ShellStyle.Normal)")
                 if !utiRecord.extensions.isEmpty {
-                    writeToStdout("  File extension\(utiRecord.extensions.count == 1 ? "" : "s"): \(listify(utiRecord.extensions))")
+                    Stdio.writeToStdout("  File extension\(utiRecord.extensions.count == 1 ? "" : "s"): \(listify(utiRecord.extensions))")
                 }
 
                 if !utiRecord.mimeTypes.isEmpty {
-                    writeToStdout("  Mime type\(utiRecord.mimeTypes.count == 1 ? "" : "s"): \(listify(utiRecord.mimeTypes))")
+                    Stdio.writeToStdout("  Mime type\(utiRecord.mimeTypes.count == 1 ? "" : "s"): \(listify(utiRecord.mimeTypes))")
                 }
 
                 if !utiRecord.parents.isEmpty {
-                    writeToStdout("  Conforms to: \(listify(utiRecord.parents))")
+                    Stdio.writeToStdout("  Conforms to: \(listify(utiRecord.parents))")
                 }
 
                 if !utiRecord.ref.isEmpty {
-                    writeToStdout("  Reference Information: \(utiRecord.ref))")
+                    Stdio.writeToStdout("  Reference Information: \(utiRecord.ref))")
                 }
 
                 var apps: [String] = []
@@ -462,9 +454,9 @@ func readLaunchServicesRegister(_ listByApp: Bool = false) {
                 }
 
                 if !apps.isEmpty {
-                    writeToStdout("  Claimed by: \(listify(apps))")
+                    Stdio.writeToStdout("  Claimed by: \(listify(apps))")
                 } else {
-                    writeToStdout("  Claimed by no apps")
+                    Stdio.writeToStdout("  Claimed by no apps")
                 }
             }
         }
@@ -509,7 +501,7 @@ func ignoreHardware(_ uti: String) -> Bool {
 func clearTimer(_ timer: Timer) {
 
     timer.invalidate()
-    write(message:"\r", to: STD_ERR)
+    Stdio.write(message:"\(ShellActions.Clearline)\r", to: ShellRoutes.Error)
 }
 
 
