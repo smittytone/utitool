@@ -27,44 +27,174 @@
 import Foundation
 
 
-// MARK: - Constant Groupings
+/*
+ Base STDIO library for use in my CLI applications.
 
-struct ShellColours {
+ Data values are a mix of enums and structs, accessed via the `Stdio` namespace.
 
-    static let Black: String        = "\u{001B}[30m"
-    static let Red: String          = "\u{001B}[31m"
-    static let Green: String        = "\u{001B}[32m"
-    static let Yellow: String       = "\u{001B}[33m"
-    static let Blue: String         = "\u{001B}[34m"
-    static let Magenta: String      = "\u{001B}[35m"
-    static let Cyan: String         = "\u{001B}[36m"
-    static let White: String        = "\u{001B}[37m"
-}
-
-
-struct ShellStyle {
-
-    static let Bold: String         = "\u{001B}[1m"
-    static let Italic: String       = "\u{001B}[3m"
-    static let Normal: String       = "\u{001B}[0m"
-}
-
-
-struct ShellActions {
-
-    static let Backspace: String    = String(UnicodeScalar(8))
-    static let Clearline: String    = "\u{001B}[2K"
-}
-
-
-struct ShellRoutes {
-
-    static let Error: FileHandle    = FileHandle.standardError
-    static let Ouptut: FileHandle   = FileHandle.standardOutput
-}
-
-
+ Functions are static and so are likewised accessed via the `Stdio` namespace.
+ */
 struct Stdio {
+
+    // MARK: - Enumerations
+
+    /*
+     The customary 8-bit shell colours.
+     */
+    enum ShellColour: Int {
+
+        case black              // 0
+        case red                // 1
+        case green              // 2
+        case yellow             // 3
+        case blue               // 4
+        case magenta            // 5
+        case cyan               // 6
+        case white              // 7
+        case undefined          // 8
+        case `default`          // 9
+
+
+        /**
+         Get the value as a foreground colour string.
+         */
+        func foreground() -> String {
+
+            return tostring(baseValue: 30)
+        }
+
+
+        /**
+         Get the value as a background colour string.
+         */
+        func background() -> String {
+
+            return tostring(baseValue: 40)
+
+        }
+
+
+        /**
+         Convert the enum to a suitable string for issuing via STDIO.
+         */
+        private func tostring(baseValue: Int) -> String {
+
+            let value = self.rawValue + baseValue
+            return "\u{001B}[\(value)m"
+        }
+    }
+
+
+    /*
+     The customary shell display styles.
+     */
+    enum ShellStyle: Int {
+
+        case normal             // 0
+        case bold               // 1
+        case dim                // 2
+        case italic             // 3
+        case underline          // 4
+        case blinking           // 5
+        case undefined          // 6
+        case inverse            // 7
+        case hidden             // 8
+        case strikethrough      // 9
+
+
+        /**
+         Get the value of the style's enable action as a string.
+         */
+        func on() -> String {
+
+            return tostring(baseValue: 0)
+        }
+
+
+        /**
+         Get the value of the style's disable action as a string.
+         */
+        func off() -> String {
+
+            return tostring(baseValue: 20)
+
+        }
+
+
+        /**
+         Convert the enum to a suitable string for issuing via STDIO.
+         */
+        private func tostring(baseValue: Int) -> String {
+
+            let value = self.rawValue + baseValue
+            return "\u{001B}[\(value)m"
+        }
+    }
+
+
+    // MARK: - Constant Structures
+    
+    struct ShellRoutes {
+
+        static let Error: FileHandle    = FileHandle.standardError
+        static let Output: FileHandle   = FileHandle.standardOutput
+    }
+
+
+    struct ShellActions {
+
+        static let Backspace: String    = String(UnicodeScalar(8))
+        static let Clearline: String    = "\u{001B}[2K"
+        static let Home: String         = "\u{001B}[H"
+
+
+        private enum Direction: String {
+            case up         = "A"
+            case down       = "B"
+            case `left`     = "C"
+            case `right`    = "D"
+            case next       = "E"
+            case previous   = "F"
+            case column     = "G"
+        }
+
+
+        func up(_ lines: Int) -> String {
+
+            return moveCursor(lines, .up)
+        }
+
+
+        func down(_ lines: Int) -> String {
+
+            return moveCursor(lines, .down)
+        }
+
+
+        func left(_ lines: Int) -> String {
+
+            return moveCursor(lines, .left)
+        }
+
+
+        func right(_ lines: Int) -> String {
+
+            return moveCursor(lines, .right)
+        }
+
+
+        private func moveCursor(_ lines: Int, _ direction: Direction) -> String {
+
+            if lines < 1 {
+                return ""
+            }
+
+            return "\u{001B}[\(lines)\(direction.rawValue)"
+        }
+    }
+
+
+    // MARK: - Public Functions for Message and Error reporting, and data output
 
     /**
      Generic message display routine.
@@ -80,7 +210,7 @@ struct Stdio {
      */
     static func reportError(_ message: String) {
 
-        writeToStderr(ShellColours.Red + ShellStyle.Bold + "ERROR" + ShellStyle.Normal + " " + message)
+        writeToStderr(String(.red) + String(.bold) + "ERROR " + String(.normal) + message)
     }
 
 
@@ -89,26 +219,17 @@ struct Stdio {
      */
     static func reportErrorAndExit(_ message: String, _ code: Int32 = EXIT_FAILURE) {
 
-        writeToStderr(ShellColours.Red + ShellStyle.Bold + "ERROR " + ShellStyle.Normal + message + " -- exiting")
+        writeToStderr(String(.red) + String(.bold) + "ERROR " + String(.normal) + message + " -- exiting")
         exit(code)
     }
 
 
     /**
-     Write errors and other messages to STD ERR with a line break.
+     Generic data output routine.
      */
-    static func writeToStderr(_ message: String) {
+    static func output(_ data: String) {
 
-        writeln(message: message, to: ShellRoutes.Error)
-    }
-
-
-    /**
-     Write errors and other messages to STD OUT with a line break.
-     */
-    static func writeToStdout(_ message: String) {
-
-        writeln(message: message, to: ShellRoutes.Ouptut)
+        writeToStdout(data)
     }
 
 
@@ -131,5 +252,44 @@ struct Stdio {
         if let textAsData: Data = (text).data(using: .utf8) {
             fileHandle.write(textAsData)
         }
+    }
+
+
+    // MARK: - Private Functions
+
+    /**
+     Write errors and other messages to STD ERR with a line break.
+     */
+    private static func writeToStderr(_ message: String) {
+
+        writeln(message: message, to: ShellRoutes.Error)
+    }
+
+
+    /**
+     Write errors and other messages to STD OUT with a line break.
+     */
+    private static func writeToStdout(_ message: String) {
+
+        writeln(message: message, to: ShellRoutes.Output)
+    }
+}
+
+
+/*
+ Essential String initialisers to support the ShellColour and ShellStyle enums
+ defined at the top of this file.
+ */
+extension String {
+
+    init(_ colour: Stdio.ShellColour, _ background: Bool = false) {
+
+        self = background ? colour.background() : colour.foreground()
+    }
+
+
+    init(_ style: Stdio.ShellStyle, _ on: Bool = true) {
+
+        self = on ? style.on() : style.off()
     }
 }
