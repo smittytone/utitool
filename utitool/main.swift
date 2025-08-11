@@ -27,12 +27,14 @@
 import Foundation
 
 
-// MARK: - Constants
+// MARK: - Global Constants
 
-// FROM 1.0.4
-let EXIT_CTRL_C_CODE: Int32 = 130
-let CTRL_C_MSG: String      = "\(Stdio.ShellActions.Backspace)\(Stdio.ShellActions.Backspace)\rutitool interrupted -- halting"
+// FROM 1.2.0
+struct CliConstants {
 
+    static let CtrlCExitCode: Int32 = 130
+    static let CtrlCMessage: String = "\(Stdio.ShellCursor.Return)\(Stdio.ShellCursor.Clearline)"
+}
 
 // MARK: - Global Variables
 
@@ -52,8 +54,9 @@ let dss: DispatchSourceSignal = DispatchSource.makeSignalSource(signal: SIGINT,
                                                                 queue: DispatchQueue.main)
 // ...add an event handler (from above)...
 dss.setEventHandler {
-    Stdio.report(CTRL_C_MSG)
-    exit(EXIT_CTRL_C_CODE)
+    Stdio.write(message: CliConstants.CtrlCMessage, to: Stdio.ShellRoutes.Error)
+    Stdio.reportWarning("utitool interrupted -- halting")
+    exit(CliConstants.CtrlCExitCode)
 }
 
 // ...and start the event flow
