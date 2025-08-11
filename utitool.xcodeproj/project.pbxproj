@@ -30,7 +30,7 @@
 
 /* Begin PBXFileReference section */
 		3B42AF132E3CD0A100FF6743 /* extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = extensions.swift; sourceTree = "<group>"; };
-		3B6DF7742E49CC4E006D895E /* utitool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = utitool; sourceTree = BUILT_PRODUCTS_DIR; };
+		3B6DF7752E49D697006D895E /* utitool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = utitool; path = /Users/smitty/GitHub/utitool/build/Debug/utitool; sourceTree = "<absolute>"; };
 		3BA6A4EA2E492FD80066BDB7 /* stdio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = stdio.swift; sourceTree = "<group>"; };
 		3BA6A4ED2E4930210066BDB7 /* LICENSE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = "<group>"; };
 		3BA6A4EE2E4930210066BDB7 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -59,7 +59,6 @@
 				5A5688E625ADFFC4002293E8 /* utitool */,
 				3BA6A4ED2E4930210066BDB7 /* LICENSE.md */,
 				3BA6A4EE2E4930210066BDB7 /* README.md */,
-				3B6DF7742E49CC4E006D895E /* utitool */,
 			);
 			sourceTree = "<group>";
 		};
@@ -95,7 +94,7 @@
 			);
 			name = utitool;
 			productName = utitool;
-			productReference = 3B6DF7742E49CC4E006D895E /* utitool */;
+			productReference = 3B6DF7752E49D697006D895E /* utitool */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -277,7 +276,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 44;
+				CURRENT_PROJECT_VERSION = 45;
 				DEAD_CODE_STRIPPING = YES;
 				DSTROOT = $SRCROOT/build/pkgroot;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -300,7 +299,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 44;
+				CURRENT_PROJECT_VERSION = 45;
 				DEAD_CODE_STRIPPING = YES;
 				DSTROOT = $SRCROOT/build/pkgroot;
 				ENABLE_HARDENED_RUNTIME = YES;
