@@ -543,7 +543,7 @@ func ignoreHardware(_ uti: String) -> Bool {
 func clearTimer(_ timer: Timer) {
 
     timer.invalidate()
-    Stdio.write(message:"\(Stdio.ShellActions.Clearline)\r", to: Stdio.ShellRoutes.Error)
+    Stdio.write(message:"\(Stdio.ShellCursor.Clearline)\r", to: Stdio.ShellRoutes.Error)
 }
 
 

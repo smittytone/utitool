@@ -141,9 +141,11 @@ struct Stdio {
     }
 
 
-    struct ShellActions {
+    struct ShellCursor {
 
         static let Backspace: String    = String(UnicodeScalar(8))
+        static let Newline: String      = String(UnicodeScalar(10))
+        static let Return: String       = String(UnicodeScalar(13))
         static let Clearline: String    = "\u{001B}[2K"
         static let Home: String         = "\u{001B}[H"
 
@@ -159,37 +161,60 @@ struct Stdio {
         }
 
 
-        func up(_ lines: Int) -> String {
+        func up(lines: Int) -> String {
 
             return moveCursor(lines, .up)
         }
 
 
-        func down(_ lines: Int) -> String {
+        func down(lines: Int) -> String {
 
             return moveCursor(lines, .down)
         }
 
 
-        func left(_ lines: Int) -> String {
+        func left(columns: Int) -> String {
 
-            return moveCursor(lines, .left)
+            return moveCursor(columns, .left)
         }
 
 
-        func right(_ lines: Int) -> String {
+        func right(columns: Int) -> String {
 
-            return moveCursor(lines, .right)
+            return moveCursor(columns, .right)
         }
 
 
-        private func moveCursor(_ lines: Int, _ direction: Direction) -> String {
+        func toColumn(_ column: Int) -> String {
 
-            if lines < 1 {
+            var amount = column
+            if amount < 0 {
+                amount = 0
+            }
+
+            return "\u{001B}[\(amount)\(Direction.column.rawValue)"
+        }
+
+
+        func back(lines: Int) -> String {
+
+            return moveCursor(lines, .previous)
+        }
+
+
+        func forward(lines: Int) -> String {
+
+            return moveCursor(lines, .next)
+        }
+
+
+        private func moveCursor(_ steps: Int, _ direction: Direction) -> String {
+
+            if steps < 1 {
                 return ""
             }
 
-            return "\u{001B}[\(lines)\(direction.rawValue)"
+            return "\u{001B}[\(steps)\(direction.rawValue)"
         }
     }
 
@@ -202,6 +227,15 @@ struct Stdio {
     static func report(_ message: String) {
 
         writeToStderr(message)
+    }
+
+
+    /**
+     Generic warning display routine.
+     */
+    static func reportWarning(_ message: String) {
+
+        writeToStderr(String(.yellow) + String(.bold) + "WARNING " + String(.normal) + message)
     }
 
 
