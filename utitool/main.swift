@@ -37,7 +37,8 @@ let CTRL_C_MSG: String      = "\(Stdio.ShellActions.Backspace)\(Stdio.ShellActio
 // MARK: - Global Variables
 
 var doOutputJson: Bool = false
-var showMoreInfo:Bool = false
+var showMoreInfo: Bool = false
+var highlightColour: String = String(Stdio.ShellColour.yellow)
 
 
 // MARK: - Runtime Start
@@ -57,6 +58,12 @@ dss.setEventHandler {
 
 // ...and start the event flow
 dss.resume()
+
+// FROM 1.2.0
+// Check for a colour shift
+if let _ = ProcessInfo.processInfo.environment["UTITOOL_USE_DARK_COLOUR"] {
+    highlightColour = String(Stdio.ShellColour.blue)
+}
 
 // Get the command line args...
 let args = CommandLine.arguments
@@ -95,9 +102,9 @@ if args.count == 1 {
 
             switch argType {
                 case 1:
-                    exit(getExtensionData(argument))
+                    exit(getExtensionData(argument, highlightColour))
                 case 2:
-                    exit(getUtiData(argument))
+                    exit(getUtiData(argument, true, highlightColour))
                 default:
                     break
             }
@@ -143,11 +150,11 @@ if args.count == 1 {
     }
 
     if doLaunchServicesReadApps {
-        readLaunchServicesRegister(true)
+        readLaunchServicesRegister(true, highlightColour)
     }
 
     if doLaunchServicesReadUtis {
-        readLaunchServicesRegister()
+        readLaunchServicesRegister(false, highlightColour)
     }
 
     // Convert passed paths to URL
@@ -175,10 +182,10 @@ if args.count == 1 {
                     }
 
                     if showMoreInfo {
-                        Stdio.report("UTI for \(String(.magenta))\(path)\(String(.normal)) is \(String(.magenta))\(uti)\(String(.normal))")
-                        _ = getUtiData(uti, false)
+                        Stdio.report("UTI for \(highlightColour)\(path)\(String(.normal)) is \(highlightColour)\(uti)\(String(.normal))")
+                        _ = getUtiData(uti, false, highlightColour)
                     } else {
-                        Stdio.report("UTI for \(String(.magenta))\(path)\(String(.normal)) is \(String(.magenta))\(uti)\(String(.normal)) (\(extra))")
+                        Stdio.report("UTI for \(highlightColour)\(path)\(String(.normal)) is \(highlightColour)\(uti)\(String(.normal)) (\(extra))")
                     }
                 } else {
                     Stdio.reportError("Could not get UTI for \(path)")

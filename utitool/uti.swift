@@ -37,11 +37,12 @@ import UniformTypeIdentifiers
  removes it.
 
  - Parameters
-    - fileExtension: The specified file extension.
+    - fileExtension:   The specified file extension.
+    - highlightColour: The current colour for printing title emphasis.
 
  - Returns An app exit code: success (0) or failure (1).
  */
-func getExtensionData(_ fileExtension: String) -> Int32 {
+func getExtensionData(_ fileExtension: String, _ highlightColour: String) -> Int32 {
 
     // Just in case the user supplied an extension with a dot
     var extn = fileExtension
@@ -52,7 +53,7 @@ func getExtensionData(_ fileExtension: String) -> Int32 {
     // Get UTI data from the extension
     let utiTypes = UTType.types(tag: extn, tagClass: .filenameExtension , conformingTo: nil)
     if utiTypes.count > 0 {
-        Stdio.report("\(String(.bold))UTI information for file extension \(String(.yellow)).\(extn)\(String(.normal))")
+        Stdio.report("\(String(.bold))UTI information for file extension \(highlightColour).\(extn)\(String(.normal))")
         if utiTypes.count > 1 {
             for (index, utiType) in utiTypes.enumerated() {
                 let head = "\(index + 1). \(String(.bold))\(utiType.identifier)\(String(.normal))"
@@ -90,17 +91,19 @@ func getExtensionData(_ fileExtension: String) -> Int32 {
  Using the supplied UTI, extract and display system information.
 
  - Parameters
-    - uti:        The specified UTI.
-    - doShowHead: Include the UTI name as a heading.
+    - uti:             The specified UTI.
+    - doShowHead:      Include the UTI name as a heading.
+    - highlightColour: The current colour for printing title emphasis.
 
  - Returns An app exit code: success (0) or failure (1).
  */
-func getUtiData(_ uti: String, _ doShowHead: Bool = true) -> Int32 {
+func getUtiData(_ uti: String, _ doShowHead: Bool, _ highlightColour: String) -> Int32 {
 
     if let utiType = UTType(uti) {
         if doShowHead {
-            Stdio.report("\(String(.bold))Information for UTI \(String(.yellow))\(utiType.identifier)\(String(.normal))")
+            Stdio.report("\(String(.bold))Information for UTI \(highlightColour)\(utiType.identifier)\(String(.normal))")
         }
+
         outputDescription(utiType)
 
         if utiType.tags.count > 0 {
@@ -235,9 +238,10 @@ func outputDescription(_ utiType: UTType, _ addSpaces: Int = 0) {
  and, if requested, apps claiming those UTIs.
 
  - Parameters
-    - listByApp: Should we also record apps? Default: false
+    - listByApp:       Should we also record apps? Default: false.
+    - highlightColour: The current colour for printing title emphasis.
  */
-func readLaunchServicesRegister(_ listByApp: Bool = false) {
+func readLaunchServicesRegister(_ listByApp: Bool = false, _ highlightColour: String) {
 
     /* This is a typical record from `lsregister -dump`
 
@@ -450,7 +454,7 @@ func readLaunchServicesRegister(_ listByApp: Bool = false) {
             // Iterate over that list and output the info
             for key in sortedKeys {
                 let appRecord = apps[key]!
-                Stdio.report("\(String(.yellow))\(String(.bold))\(key)\(String(.normal)) is associated with the following UTIs:")
+                Stdio.report("\(highlightColour)\(String(.bold))\(key)\(String(.normal)) is associated with the following UTIs:")
                 if !appRecord.utis.isEmpty {
                     // Order the subsidiary UTI list
                     let orderedUtis = appRecord.utis.sorted { $0.uti < $1.uti }
@@ -467,7 +471,7 @@ func readLaunchServicesRegister(_ listByApp: Bool = false) {
             // Iterate over that list and output the info
             for key in sortedKeys {
                 let utiRecord = utis[key]!
-                Stdio.report("\(String(.yellow))\(String(.bold))\(key)\(String(.normal))")
+                Stdio.report("\(highlightColour)\(String(.bold))\(key)\(String(.normal))")
                 if !utiRecord.extensions.isEmpty {
                     Stdio.report("    File extension\(utiRecord.extensions.count == 1 ? "" : "s"): \(listify(utiRecord.extensions))")
                 }
@@ -531,8 +535,10 @@ func ignoreHardware(_ uti: String) -> Bool {
 
     return false
 }
+
+
 /**
- Shutdown the timer and clear the line
+ Shutdown the timer and clear the line.
  */
 func clearTimer(_ timer: Timer) {
 
