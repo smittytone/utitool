@@ -45,6 +45,12 @@ var highlightColour: String = String(Stdio.ShellColour.yellow)
 
 // MARK: - Runtime Start
 
+// FROM 1.2.0
+// Will this ever be shown? I wish I had an old Mac to try it on!
+if ProcessInfo.processInfo.operatingSystemVersion.majorVersion < 11 {
+    Stdio.reportErrorAndExit("utitool requires macOS 11 or above")
+}
+
 // Trap CTRL-C
 // Make sure the signal does not terminate the application
 signal(SIGINT, SIG_IGN)
