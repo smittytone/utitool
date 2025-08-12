@@ -12,7 +12,7 @@ For more details, and full usage information, [please see my website](https://sm
 
 ## Release Notes ##
 
-- 1.2.0 *Unreleased*
+- 1.2.0 *12 August 2025*
     - Add `--list` and `--app` options to retrieve and display system-recorded information for, respectively, UTIs and apps.
     - Support machine- or human-readable output for the above commands, with the `--json` switch for the former.
     - Add `UTITOOL_USE_DARK_COLOUR` environment variable for users with dark-on-light Terminal colouring.
