@@ -56,17 +56,18 @@ if ProcessInfo.processInfo.operatingSystemVersion.majorVersion < 11 {
 signal(SIGINT, SIG_IGN)
 
 // Set up an event source for SIGINT...
-let dss: DispatchSourceSignal = DispatchSource.makeSignalSource(signal: SIGINT,
-                                                                queue: DispatchQueue.main)
+Stdio.dss = DispatchSource.makeSignalSource(signal: SIGINT, queue: DispatchQueue.main)
+
 // ...add an event handler (from above)...
-dss.setEventHandler {
+Stdio.dss?.setEventHandler {
     Stdio.write(message: CliConstants.CtrlCMessage, to: Stdio.ShellRoutes.Error)
     Stdio.reportWarning("utitool interrupted -- halting")
+    Stdio.dss?.cancel()
     exit(CliConstants.CtrlCExitCode)
 }
 
 // ...and start the event flow
-dss.resume()
+Stdio.dss?.resume()
 
 // FROM 1.2.0
 // Check for a colour shift
@@ -75,7 +76,7 @@ if let _ = ProcessInfo.processInfo.environment["UTITOOL_USE_DARK_COLOUR"] {
 }
 
 // Get the command line args...
-let args = CommandLine.arguments
+let args = unify(args: CommandLine.arguments)
 
 // ...and process them
 if args.count == 1 {
@@ -213,6 +214,7 @@ if args.count == 1 {
 }
 
 // Exit gracefully
+Stdio.dss?.cancel()
 exit(EXIT_SUCCESS)
 
 
@@ -227,7 +229,8 @@ func showHelp() {
 
     Stdio.report("\nA macOS tool to reveal a specified file’s Uniform Type Identifier (UTI).")
     Stdio.report("It can also be used to display information about a specific UTI, or a supplied file extension,")
-    Stdio.report("and to view what information macOS holds about UTIs and the apps that claim them.\r\n")
+    Stdio.report("and to view what information macOS holds about UTIs and the apps that claim them.")
+    Stdio.report("\(String(.italic))https://smittytone.net/utitool/index.html\(String(.normal))\r\n")
     Stdio.report("\(String(.bold))USAGE\(String(.normal))\n    utitool [--more] [path 1] [path 2] ... [path \(String(.italic))n\(String(.normal))]    View specific files’ UTIs.")
     Stdio.report("            [--uti [UTI]]                              View data for a specific UTI.")
     Stdio.report("            [--extension {file extension}]             View data for a specific file extension.")

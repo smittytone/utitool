@@ -219,6 +219,11 @@ struct Stdio {
     }
 
 
+    // MARK: - Public Properties
+
+    static var dss: DispatchSourceSignal? = nil
+
+
     // MARK: - Public Functions for Message and Error reporting, and data output
 
     /**
@@ -254,6 +259,7 @@ struct Stdio {
     static func reportErrorAndExit(_ message: String, _ code: Int32 = EXIT_FAILURE) {
 
         writeToStderr(String(.red) + String(.bold) + "ERROR " + String(.normal) + message + " -- exiting")
+        dss?.cancel()
         exit(code)
     }
 
@@ -310,10 +316,8 @@ struct Stdio {
 }
 
 
-/*
- Essential String initialisers to support the ShellColour and ShellStyle enums
- defined at the top of this file.
- */
+// MARK: - Foundation Extensions
+
 extension String {
 
     init(_ colour: Stdio.ShellColour, _ background: Bool = false) {

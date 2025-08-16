@@ -68,3 +68,44 @@ func processRelativePath(_ relativePath: String) -> String {
 }
 
 
+/**
+ Check if a path references a directory.
+
+ - Parameters
+    - absolutePath: An absolute path to a file or directory.
+
+ - Returns `true` if the path references an existing directory, otherwise `false`.
+ */
+func doesPathReferenceDirectory(_ absolutePath: String) -> Bool {
+
+    let fileURL = URL(fileURLWithPath: absolutePath)
+    guard let value = try? fileURL.resourceValues(forKeys: [.isDirectoryKey]) else { return false }
+    return value.isDirectory!
+}
+
+
+/**
+ Load a named file's contents into Data.
+
+ - Parameters
+    - filePath: An absolute path to a file.
+
+ - Returns The file data, or an empty array on error.
+ */
+func getFileContents(_ filepath: String) -> ArraySlice<UInt8> {
+
+    let fileURL: URL = URL(fileURLWithPath: filepath)
+    guard let data = try? Data(contentsOf: fileURL) else { return [] }
+    return data.bytes[...]
+}
+
+
+// MARK: - Foundation Extensions
+
+extension Data {
+
+    // Return data as an array of bytes
+    var bytes: [UInt8] {
+        return [UInt8](self)
+    }
+}
