@@ -1,0 +1,27 @@
+## Release Notes ##
+
+- 1.2.1 *Unreleased*
+    - Support combined command line switches, eg. `-lj` (list UTIs, output to JSON).
+    - Under-the-hood non-functional changes:
+        - Namespace more files using structs.
+- 1.2.0 *12 August 2025*
+    - Add `--list` and `--app` options to retrieve and display system-recorded information for, respectively, UTIs and apps.
+    - Support machine- or human-readable output for the above commands, with the `--json` switch for the former.
+    - Add `UTITOOL_USE_DARK_COLOUR` environment variable for users with dark-on-light Terminal colouring.
+    - Check for correct macOS version.
+    - Reorganise the code base to separate out key components.
+- 1.1.0 *1 August 2025*
+    - Add extra file information.
+    - Add `--extension` option to show info about specified a file extension.
+    - Add `--uti` option to show info about a specified UTI.
+    - Add `--more` option to show extra UTI information about specified files.
+- 1.0.4 *23 July 2021*
+    - Add async signal safe ctrl-c trapping code.
+- 1.0.3 *15 June 2021*
+    - Add support for macOS 11 Big Sur’s `UTType` API.
+- 1.0.2 *8 February 2021*
+    - Minor change to help text.
+- 1.0.1 *4 February 2021*
+    - Tiny bit of refactoring.
+- 1.0.0 *12 January 2021*
+    - Initial public release.
