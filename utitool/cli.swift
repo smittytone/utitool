@@ -26,34 +26,42 @@
 
 import Foundation
 
-func unify(args: [String]) -> [String] {
 
-    var newArgs: [String] = []
+struct Cli {
 
-    for arg in args {
-        // Look for compound flags, ie. a single dash followed by
-        // more than one flag identifier
-        if arg.prefix(1) == "-" && arg.prefix(2) != "--" {
-            if arg.count > 2 {
-                // arg is of form '-mfs'
-                for subArg in arg {
-                    // Check for and ignore interior dashes
-                    // eg. in `-mf-l`
-                    if subArg == "-" {
-                        continue
+    static let CtrlCExitCode: Int32 = 130
+    static let CtrlCMessage: String = "\(Stdio.ShellCursor.Return)\(Stdio.ShellCursor.Clearline)"
+
+
+    static func unify(args: [String]) -> [String] {
+
+        var newArgs: [String] = []
+
+        for arg in args {
+            // Look for compound flags, ie. a single dash followed by
+            // more than one flag identifier
+            if arg.prefix(1) == "-" && arg.prefix(2) != "--" {
+                if arg.count > 2 {
+                    // arg is of form '-mfs'
+                    for subArg in arg {
+                        // Check for and ignore interior dashes
+                        // eg. in `-mf-l`
+                        if subArg == "-" {
+                            continue
+                        }
+
+                        // Retain the flag as a standard arg for subsequent processing
+                        newArgs.append("-\(subArg)")
                     }
 
-                    // Retain the flag as a standard arg for subsequent processing
-                    newArgs.append("-\(subArg)")
+                    continue
                 }
-
-                continue
             }
+
+            // It's an ordinary arg, so retain it
+            newArgs.append(arg)
         }
 
-        // It's an ordinary arg, so retain it
-        newArgs.append(arg)
+        return newArgs
     }
-
-    return newArgs
 }

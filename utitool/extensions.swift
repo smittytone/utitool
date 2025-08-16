@@ -28,8 +28,6 @@ import Foundation
 import UniformTypeIdentifiers
 
 
-// MARK: - URL Extensions
-
 extension URL {
 
     var typeIdentifier: String? {
@@ -67,8 +65,6 @@ extension URL {
     }
 }
 
-
-// MARK: - String Extensions
 
 extension String {
 

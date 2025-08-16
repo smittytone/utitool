@@ -29,79 +29,83 @@ import Foundation
 
 // MARK: - Path Processing Functions
 
-/**
- Convert a partial path to an absolute path.
+struct Path {
 
- - Parameters
-    - relativePath: The partial path.
+    /**
+     Convert a partial path to an absolute path.
 
- - Returns The generated absolute path.
- */
-func getFullPath(_ relativePath: String) -> String {
+     - Parameters
+     - relativePath: The partial path.
 
-    // Standardise the path as best as we can (this covers most cases)
-    var absolutePath: String = (relativePath as NSString).standardizingPath
+     - Returns The generated absolute path.
+     */
+    static func getFullPath(_ relativePath: String) -> String {
 
-    // Check for a unresolved relative path -- and if it is one, resolve it
-    // NOTE This includes raw filenames
-    if (absolutePath as NSString).contains("..") || !(absolutePath as NSString).hasPrefix("/") {
-        absolutePath = processRelativePath(absolutePath)
+        // Standardise the path as best as we can (this covers most cases)
+        var absolutePath: String = (relativePath as NSString).standardizingPath
+
+        // Check for a unresolved relative path -- and if it is one, resolve it
+        // NOTE This includes raw filenames
+        if (absolutePath as NSString).contains("..") || !(absolutePath as NSString).hasPrefix("/") {
+            absolutePath = processRelativePath(absolutePath)
+        }
+
+        // Return the absolute path
+        return absolutePath
     }
 
-    // Return the absolute path
-    return absolutePath
+
+    /**
+     Add the the current working directory to the supplied relative path - and then resolve it.
+
+     - Parameters
+     - relativePath: The partial path.
+
+     - Returns The generated absolute path.
+     */
+    static func processRelativePath(_ relativePath: String) -> String {
+
+        let absolutePath = FileManager.default.currentDirectoryPath + "/" + relativePath
+        return (absolutePath as NSString).standardizingPath
+    }
+
+
+    /**
+     Check if a path references a directory.
+
+     - Parameters
+     - absolutePath: An absolute path to a file or directory.
+
+     - Returns `true` if the path references an existing directory, otherwise `false`.
+     */
+    static func doesPathReferenceDirectory(_ absolutePath: String) -> Bool {
+
+        let fileURL = URL(fileURLWithPath: absolutePath)
+        guard let value = try? fileURL.resourceValues(forKeys: [.isDirectoryKey]) else { return false }
+        return value.isDirectory!
+    }
+
+
+    /**
+     Load a named file's contents into Data.
+
+     - Parameters
+     - filePath: An absolute path to a file.
+
+     - Returns The file data, or an empty array on error.
+     */
+    static func getFileContents(_ filepath: String) -> ArraySlice<UInt8> {
+
+        let fileURL: URL = URL(fileURLWithPath: filepath)
+        guard let data = try? Data(contentsOf: fileURL) else { return [] }
+        return data.bytes[...]
+    }
 }
 
 
-/**
- Add the the current working directory to the supplied relative path - and then resolve it.
-
- - Parameters
-    - relativePath: The partial path.
-
- - Returns The generated absolute path.
+/*
+ This extension property is required by the path functions.
  */
-func processRelativePath(_ relativePath: String) -> String {
-
-    let absolutePath = FileManager.default.currentDirectoryPath + "/" + relativePath
-    return (absolutePath as NSString).standardizingPath
-}
-
-
-/**
- Check if a path references a directory.
-
- - Parameters
-    - absolutePath: An absolute path to a file or directory.
-
- - Returns `true` if the path references an existing directory, otherwise `false`.
- */
-func doesPathReferenceDirectory(_ absolutePath: String) -> Bool {
-
-    let fileURL = URL(fileURLWithPath: absolutePath)
-    guard let value = try? fileURL.resourceValues(forKeys: [.isDirectoryKey]) else { return false }
-    return value.isDirectory!
-}
-
-
-/**
- Load a named file's contents into Data.
-
- - Parameters
-    - filePath: An absolute path to a file.
-
- - Returns The file data, or an empty array on error.
- */
-func getFileContents(_ filepath: String) -> ArraySlice<UInt8> {
-
-    let fileURL: URL = URL(fileURLWithPath: filepath)
-    guard let data = try? Data(contentsOf: fileURL) else { return [] }
-    return data.bytes[...]
-}
-
-
-// MARK: - Foundation Extensions
-
 extension Data {
 
     // Return data as an array of bytes

@@ -27,15 +27,6 @@
 import Foundation
 
 
-// MARK: - Global Constants
-
-// FROM 1.2.0
-struct CliConstants {
-
-    static let CtrlCExitCode: Int32 = 130
-    static let CtrlCMessage: String = "\(Stdio.ShellCursor.Return)\(Stdio.ShellCursor.Clearline)"
-}
-
 // MARK: - Global Variables
 
 var doOutputJson: Bool = false
@@ -56,18 +47,18 @@ if ProcessInfo.processInfo.operatingSystemVersion.majorVersion < 11 {
 signal(SIGINT, SIG_IGN)
 
 // Set up an event source for SIGINT...
-Stdio.dss = DispatchSource.makeSignalSource(signal: SIGINT, queue: DispatchQueue.main)
+Stdio.dispatchSource = DispatchSource.makeSignalSource(signal: SIGINT, queue: DispatchQueue.main)
 
 // ...add an event handler (from above)...
-Stdio.dss?.setEventHandler {
-    Stdio.write(message: CliConstants.CtrlCMessage, to: Stdio.ShellRoutes.Error)
+Stdio.dispatchSource?.setEventHandler {
+    Stdio.write(message: Cli.CtrlCMessage, to: Stdio.ShellRoutes.Error)
     Stdio.reportWarning("utitool interrupted -- halting")
-    Stdio.dss?.cancel()
-    exit(CliConstants.CtrlCExitCode)
+    Stdio.dispatchSource?.cancel()
+    exit(Cli.CtrlCExitCode)
 }
 
 // ...and start the event flow
-Stdio.dss?.resume()
+Stdio.dispatchSource?.resume()
 
 // FROM 1.2.0
 // Check for a colour shift
@@ -76,7 +67,7 @@ if let _ = ProcessInfo.processInfo.environment["UTITOOL_USE_DARK_COLOUR"] {
 }
 
 // Get the command line args...
-let args = unify(args: CommandLine.arguments)
+let args = Cli.unify(args: CommandLine.arguments)
 
 // ...and process them
 if args.count == 1 {
@@ -112,9 +103,9 @@ if args.count == 1 {
 
             switch argType {
                 case 1:
-                    exit(getExtensionData(argument, highlightColour))
+                    exit(Uti.getExtensionData(argument, highlightColour))
                 case 2:
-                    exit(getUtiData(argument, true, highlightColour))
+                    exit(Uti.getUtiData(argument, true, highlightColour))
                 default:
                     break
             }
@@ -160,17 +151,17 @@ if args.count == 1 {
     }
 
     if doLaunchServicesReadApps {
-        readLaunchServicesRegister(true, highlightColour)
+        Uti.readLaunchServicesRegister(true, highlightColour)
     }
 
     if doLaunchServicesReadUtis {
-        readLaunchServicesRegister(false, highlightColour)
+        Uti.readLaunchServicesRegister(false, highlightColour)
     }
 
     // Convert passed paths to URL
     if files.count > 0 {
         for file in files {
-            let path = getFullPath(file)
+            let path = Path.getFullPath(file)
             var isDir: ObjCBool = false
 
             // Check that we're only dealing with files
@@ -193,7 +184,7 @@ if args.count == 1 {
 
                     if showMoreInfo {
                         Stdio.report("UTI for \(highlightColour)\(path)\(String(.normal)) is \(highlightColour)\(uti)\(String(.normal))")
-                        _ = getUtiData(uti, false, highlightColour)
+                        _ = Uti.getUtiData(uti, false, highlightColour)
                     } else {
                         Stdio.report("UTI for \(highlightColour)\(path)\(String(.normal)) is \(highlightColour)\(uti)\(String(.normal)) (\(extra))")
                     }
@@ -214,7 +205,7 @@ if args.count == 1 {
 }
 
 // Exit gracefully
-Stdio.dss?.cancel()
+Stdio.dispatchSource?.cancel()
 exit(EXIT_SUCCESS)
 
 

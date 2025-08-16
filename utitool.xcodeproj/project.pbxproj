@@ -36,6 +36,7 @@
 		3BA6A4ED2E4930210066BDB7 /* LICENSE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = "<group>"; };
 		3BA6A4EE2E4930210066BDB7 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		3BD947CC2E50E27C00A3245D /* cli.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = cli.swift; sourceTree = "<group>"; };
+		3BD947CE2E50F2EE00A3245D /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 		3BDDE23E2E3E299800BB8AD4 /* processes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = processes.swift; sourceTree = "<group>"; };
 		3BDDE2402E3E672100BB8AD4 /* entities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = entities.swift; sourceTree = "<group>"; };
 		3BEC96BA2E4771E100F541D5 /* uti.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = uti.swift; sourceTree = "<group>"; };
@@ -61,6 +62,7 @@
 				5A5688E625ADFFC4002293E8 /* utitool */,
 				3BA6A4ED2E4930210066BDB7 /* LICENSE.md */,
 				3BA6A4EE2E4930210066BDB7 /* README.md */,
+				3BD947CE2E50F2EE00A3245D /* CHANGELOG.md */,
 				3B6DF7762E4B2103006D895E /* utitool */,
 			);
 			sourceTree = "<group>";
@@ -281,7 +283,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 49;
+				CURRENT_PROJECT_VERSION = 50;
 				DEAD_CODE_STRIPPING = YES;
 				DSTROOT = $SRCROOT/build/pkgroot;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -304,7 +306,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 49;
+				CURRENT_PROJECT_VERSION = 50;
 				DEAD_CODE_STRIPPING = YES;
 				DSTROOT = $SRCROOT/build/pkgroot;
 				ENABLE_HARDENED_RUNTIME = YES;

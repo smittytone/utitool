@@ -36,8 +36,6 @@ import Foundation
  */
 struct Stdio {
 
-    // MARK: - Enumerations
-
     /*
      The customary 8-bit shell colours.
      */
@@ -132,8 +130,6 @@ struct Stdio {
     }
 
 
-    // MARK: - Constant Structures
-    
     struct ShellRoutes {
 
         static let Error: FileHandle    = FileHandle.standardError
@@ -142,13 +138,6 @@ struct Stdio {
 
 
     struct ShellCursor {
-
-        static let Backspace: String    = String(UnicodeScalar(8))
-        static let Newline: String      = String(UnicodeScalar(10))
-        static let Return: String       = String(UnicodeScalar(13))
-        static let Clearline: String    = "\u{001B}[2K"
-        static let Home: String         = "\u{001B}[H"
-
 
         private enum Direction: String {
             case up         = "A"
@@ -159,6 +148,13 @@ struct Stdio {
             case previous   = "F"
             case column     = "G"
         }
+
+
+        static let Backspace: String    = String(UnicodeScalar(8))
+        static let Newline: String      = String(UnicodeScalar(10))
+        static let Return: String       = String(UnicodeScalar(13))
+        static let Clearline: String    = "\u{001B}[2K"
+        static let Home: String         = "\u{001B}[H"
 
 
         func up(lines: Int) -> String {
@@ -219,12 +215,12 @@ struct Stdio {
     }
 
 
-    // MARK: - Public Properties
+    // MARK: Public Properties
 
-    static var dss: DispatchSourceSignal? = nil
+    static var dispatchSource: DispatchSourceSignal? = nil
 
 
-    // MARK: - Public Functions for Message and Error reporting, and data output
+    // MARK: Public Functions for Reporting and Data Output
 
     /**
      Generic message display routine.
@@ -259,7 +255,7 @@ struct Stdio {
     static func reportErrorAndExit(_ message: String, _ code: Int32 = EXIT_FAILURE) {
 
         writeToStderr(String(.red) + String(.bold) + "ERROR " + String(.normal) + message + " -- exiting")
-        dss?.cancel()
+        dispatchSource?.cancel()
         exit(code)
     }
 
@@ -295,7 +291,7 @@ struct Stdio {
     }
 
 
-    // MARK: - Private Functions
+    // MARK: Private Functions
 
     /**
      Write errors and other messages to STD ERR with a line break.
@@ -316,8 +312,9 @@ struct Stdio {
 }
 
 
-// MARK: - Foundation Extensions
-
+/*
+ These extension initialisers are required by `Stdio`.
+ */
 extension String {
 
     init(_ colour: Stdio.ShellColour, _ background: Bool = false) {
