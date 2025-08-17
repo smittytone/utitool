@@ -1,9 +1,8 @@
 ## Release Notes ##
 
-- 1.2.1 *Unreleased*
+- 1.2.1 *17 August 2025*
     - Support combined command line switches, eg. `-lj` (list UTIs, output to JSON).
-    - Under-the-hood non-functional changes:
-        - Namespace more files using structs.
+    - Under-the-hood non-functional changes: namespace more files using structs.
 - 1.2.0 *12 August 2025*
     - Add `--list` and `--app` options to retrieve and display system-recorded information for, respectively, UTIs and apps.
     - Support machine- or human-readable output for the above commands, with the `--json` switch for the former.

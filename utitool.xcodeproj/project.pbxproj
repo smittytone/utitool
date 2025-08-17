@@ -31,7 +31,7 @@
 
 /* Begin PBXFileReference section */
 		3B42AF132E3CD0A100FF6743 /* extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = extensions.swift; sourceTree = "<group>"; };
-		3B6DF7762E4B2103006D895E /* utitool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = utitool; sourceTree = BUILT_PRODUCTS_DIR; };
+		3B6DF7762E4B2103006D895E /* utitool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = utitool; path = /Users/smitty/GitHub/utitool/build/Debug/utitool; sourceTree = "<absolute>"; };
 		3BA6A4EA2E492FD80066BDB7 /* stdio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = stdio.swift; sourceTree = "<group>"; };
 		3BA6A4ED2E4930210066BDB7 /* LICENSE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = "<group>"; };
 		3BA6A4EE2E4930210066BDB7 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -63,7 +63,6 @@
 				3BA6A4ED2E4930210066BDB7 /* LICENSE.md */,
 				3BA6A4EE2E4930210066BDB7 /* README.md */,
 				3BD947CE2E50F2EE00A3245D /* CHANGELOG.md */,
-				3B6DF7762E4B2103006D895E /* utitool */,
 			);
 			sourceTree = "<group>";
 		};

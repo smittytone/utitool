@@ -220,13 +220,12 @@ func showHelp() {
 
     Stdio.report("\nA macOS tool to reveal a specified file’s Uniform Type Identifier (UTI).")
     Stdio.report("It can also be used to display information about a specific UTI, or a supplied file extension,")
-    Stdio.report("and to view what information macOS holds about UTIs and the apps that claim them.")
-    Stdio.report("\(String(.italic))https://smittytone.net/utitool/index.html\(String(.normal))\r\n")
-    Stdio.report("\(String(.bold))USAGE\(String(.normal))\n    utitool [--more] [path 1] [path 2] ... [path \(String(.italic))n\(String(.normal))]    View specific files’ UTIs.")
-    Stdio.report("            [--uti [UTI]]                              View data for a specific UTI.")
-    Stdio.report("            [--extension {file extension}]             View data for a specific file extension.")
-    Stdio.report("            [--list] [--json]                          List system UTI data, with optional JSON output.")
-    Stdio.report("            [--apps] [--json]                          List system app data, with optional JSON output.")
+    Stdio.report("and to view what information macOS holds about UTIs and the apps that claim them.\n")
+    Stdio.report("\(String(.bold))USAGE\(String(.normal))\n    utitool [--more/-m] [path 1] [path 2] ... [path \(String(.italic))n\(String(.normal))] View specific files’ UTIs.")
+    Stdio.report("            [--uti/-u [UTI]]                           View data for a specific UTI.")
+    Stdio.report("            [--extension/-e {file extension}]          View data for a specific file extension.")
+    Stdio.report("            [--list/-l] [--json/-j]                    List system UTI data, with optional JSON output.")
+    Stdio.report("            [--apps/-a] [--json/-j]                    List system app data, with optional JSON output.")
     Stdio.report("\r\n\(String(.bold))EXAMPLES\(String(.normal))")
     Stdio.report("    utitool text.md                     Get UTI for a named file in the current directory.")
     Stdio.report("    utitool -m text.md                  Get extended UTI info for a named file in the current directory.")
@@ -237,6 +236,7 @@ func showHelp() {
     Stdio.report("    utitool -l                          View human-readable UTI information held by macOS.")
     Stdio.report("    utitool -a                          View human-readable app information held by macOS.")
     Stdio.report("    utitool -l -j                       Output pipeable UTI information held by macOS in JSON.\n")
+    Stdio.report("\(String(.italic))https://smittytone.net/utitool/index.html\(String(.normal))")
 }
 
 
