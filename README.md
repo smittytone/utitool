@@ -1,4 +1,4 @@
-# utitool 1.2.0
+# utitool 1.2.1
 
 *utitool* is a macOS command line tool you can use to reveal a file’s Uniform Type Identifier (UTI).
 
