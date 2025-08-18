@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -31,11 +31,11 @@
 
 /* Begin PBXFileReference section */
 		3B3303052E533BC000FD976C /* utitool.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = utitool.1; sourceTree = "<group>"; };
-		3B3303072E5344C000FD976C /* utitool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = utitool; path = /Users/smitty/GitHub/utitool/build/Debug/utitool; sourceTree = "<absolute>"; };
 		3B42AF132E3CD0A100FF6743 /* extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = extensions.swift; sourceTree = "<group>"; };
 		3BA6A4EA2E492FD80066BDB7 /* stdio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = stdio.swift; sourceTree = "<group>"; };
 		3BA6A4ED2E4930210066BDB7 /* LICENSE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = "<group>"; };
 		3BA6A4EE2E4930210066BDB7 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		3BC0C31A2E536366005A16DB /* utitool */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = text; name = utitool; path = /Users/smitty/GitHub/utitool/build/Debug/utitool; sourceTree = "<absolute>"; };
 		3BD947CC2E50E27C00A3245D /* cli.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = cli.swift; sourceTree = "<group>"; };
 		3BD947CE2E50F2EE00A3245D /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 		3BDDE23E2E3E299800BB8AD4 /* processes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = processes.swift; sourceTree = "<group>"; };
@@ -109,7 +109,7 @@
 			);
 			name = utitool;
 			productName = utitool;
-			productReference = 3B3303072E5344C000FD976C /* utitool */;
+			productReference = 3BC0C31A2E536366005A16DB /* utitool */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -128,6 +128,7 @@
 				};
 			};
 			buildConfigurationList = 5A5688DF25ADFFC4002293E8 /* Build configuration list for PBXProject "utitool" */;
+			compatibilityVersion = "Xcode 12.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -135,7 +136,6 @@
 				Base,
 			);
 			mainGroup = 5A5688DB25ADFFC4002293E8;
-			preferredProjectObjectVersion = 77;
 			productRefGroup = 5A5688DB25ADFFC4002293E8;
 			projectDirPath = "";
 			projectRoot = "";
