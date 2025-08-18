@@ -1,0 +1,79 @@
+.TH UTITOOL "1" "August 2025" "utitool 1.2.1"
+
+.SH NAME
+utitool \- Retrieve file and system Uniform Type Identifier (UTI) information.
+
+.SH SYNOPSIS
+.P
+\fButitool\fR [\fB\-e\fR file extension]
+.P
+\fButitool\fR [\fB\-u\fR UTI]
+.P
+\fButitool\fR [\fB\-l\fR] [\fB\-j\fR]
+.P
+\fButitool\fR [\fB\-a\fR] [\fB\-j\fR]
+.P
+\fButitool\fR [\fB\-m\fR] path...
+.P
+              [\fB\-h\fR] [\fB\--version\fR]
+
+.SH DESCRIPTION
+.P
+\fButitool\fR can retrieve UTI information for one or more files. Separately, it can be used to retrieve information about a specific UTI (eg. \fInet.daringfireball.markdown\fR) or a specific file extension (eg. \fImd\fR).
+
+A third mode retrieves and lists system-held UTI information or UTI-relevant app information.
+
+.SH USAGE
+
+Options are used in specific modes.
+
+\fBFile Mode\fR
+.P
+{path}                            The path to the target file or files.
+.P
+\fB\-m\fR | \fB\-\-more\fR                       Display extra information about each file.
+
+\fBSpecific UTI or File Extension Mode\fR
+.P
+\fB\-u\fR | \fB\-\-uti\fR {UTI}                  The UTI you are interested in.
+.P
+\fB\-e\fR | \fB\-\-extension\fR {extension}      The file extension you are interested in.
+
+\fBSystem Information Mode\fR
+.P
+\fB\-l\fR | \fB\-\-list\fR                       List information on the UTIs recorded by the system.
+.P
+\fB\-a\fR | \fB\-\-apps\fR                       List information on the apps recorded by the system.
+.P
+\fB\-j\fR | \fB\-\-json\fR                       Output the above information as JSON.
+
+\fBAll Modes\fR
+.P
+\fB\-h\fR | \fB\-\-help\fR                       The help screen.
+.P
+\fB\-\-version\fR                         Show \fButitool\fR version information.
+.PP
+
+.SH EXAMPLES
+.P
+utitool ~/Downloads/files
+.P
+utitool \-\-more ~/Downloads/files/file.md
+.P
+utitool \-\-uti net.daringfireball.markdown
+.P
+utitool \-\-extension pdf
+.P
+utitool \-\-list
+.P
+uitool \-\-list \-\-json
+.P
+utitool \-lj
+.P
+uitool \-\-apps \-\-json
+
+.SH COPYRIGHT
+Code and design copyright © 2025, Tony Smith (\fB@smittytone\fR). Source code available under the MIT licence.
+
+.SH "SEE ALSO"
+\fIhttps://smittytone.net/utitool/index.html\fR

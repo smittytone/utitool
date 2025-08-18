@@ -30,7 +30,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		3B3303042E533B4C00FD976C /* utitool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = utitool; path = /Users/smitty/GitHub/utitool/build/Debug/utitool; sourceTree = "<absolute>"; };
+		3B3303052E533BC000FD976C /* utitool.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = utitool.1; sourceTree = "<group>"; };
+		3B3303072E5344C000FD976C /* utitool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = utitool; path = /Users/smitty/GitHub/utitool/build/Debug/utitool; sourceTree = "<absolute>"; };
 		3B42AF132E3CD0A100FF6743 /* extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = extensions.swift; sourceTree = "<group>"; };
 		3BA6A4EA2E492FD80066BDB7 /* stdio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = stdio.swift; sourceTree = "<group>"; };
 		3BA6A4ED2E4930210066BDB7 /* LICENSE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = "<group>"; };
@@ -56,6 +57,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3B3303062E533BC000FD976C /* manpage */ = {
+			isa = PBXGroup;
+			children = (
+				3B3303052E533BC000FD976C /* utitool.1 */,
+			);
+			path = manpage;
+			sourceTree = "<group>";
+		};
 		5A5688DB25ADFFC4002293E8 = {
 			isa = PBXGroup;
 			children = (
@@ -63,6 +72,7 @@
 				3BA6A4ED2E4930210066BDB7 /* LICENSE.md */,
 				3BA6A4EE2E4930210066BDB7 /* README.md */,
 				3BD947CE2E50F2EE00A3245D /* CHANGELOG.md */,
+				3B3303062E533BC000FD976C /* manpage */,
 			);
 			sourceTree = "<group>";
 		};
@@ -99,7 +109,7 @@
 			);
 			name = utitool;
 			productName = utitool;
-			productReference = 3B3303042E533B4C00FD976C /* utitool */;
+			productReference = 3B3303072E5344C000FD976C /* utitool */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -282,13 +292,13 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 50;
+				CURRENT_PROJECT_VERSION = 51;
 				DEAD_CODE_STRIPPING = YES;
 				DSTROOT = $SRCROOT/build/pkgroot;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/utitool/Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 11.5;
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.2.2;
 				OBJROOT = "$(SYMROOT)";
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.bps.utitool;
@@ -305,13 +315,13 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 50;
+				CURRENT_PROJECT_VERSION = 51;
 				DEAD_CODE_STRIPPING = YES;
 				DSTROOT = $SRCROOT/build/pkgroot;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/utitool/Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 11.5;
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.2.2;
 				OBJROOT = "$(SYMROOT)";
 				OTHER_CODE_SIGN_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.bps.utitool;

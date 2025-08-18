@@ -1,5 +1,7 @@
 ## Release Notes ##
 
+- 1.2.2 *Unreleased*
+    - Add `man` page.
 - 1.2.1 *17 August 2025*
     - Support combined command line switches, eg. `-lj` (list UTIs, output to JSON).
     - Under-the-hood non-functional changes: namespace more files using structs.
