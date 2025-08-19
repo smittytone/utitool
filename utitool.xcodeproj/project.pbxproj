@@ -8,12 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		3B42AF142E3CD0A100FF6743 /* extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B42AF132E3CD0A100FF6743 /* extensions.swift */; };
-		3BA6A4EB2E492FD80066BDB7 /* stdio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BA6A4EA2E492FD80066BDB7 /* stdio.swift */; };
-		3BD947CD2E50E27C00A3245D /* cli.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BD947CC2E50E27C00A3245D /* cli.swift */; };
-		3BDDE23F2E3E299800BB8AD4 /* processes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BDDE23E2E3E299800BB8AD4 /* processes.swift */; };
+		3B757F6E2E5491BF00567756 /* stdio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B757F6D2E5491BF00567756 /* stdio.swift */; };
+		3B757F6F2E5491BF00567756 /* path.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B757F6B2E5491BF00567756 /* path.swift */; };
+		3B757F702E5491BF00567756 /* processes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B757F6C2E5491BF00567756 /* processes.swift */; };
+		3B757F712E5491BF00567756 /* cli.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B757F6A2E5491BF00567756 /* cli.swift */; };
 		3BDDE2412E3E672100BB8AD4 /* entities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BDDE2402E3E672100BB8AD4 /* entities.swift */; };
 		3BEC96BB2E4771E100F541D5 /* uti.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BEC96BA2E4771E100F541D5 /* uti.swift */; };
-		3BEC96BD2E47725F00F541D5 /* path.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BEC96BC2E47725F00F541D5 /* path.swift */; };
 		5A5688E825ADFFC4002293E8 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5688E725ADFFC4002293E8 /* main.swift */; };
 /* End PBXBuildFile section */
 
@@ -33,15 +33,15 @@
 		3B3303052E533BC000FD976C /* utitool.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = utitool.1; sourceTree = "<group>"; };
 		3B42AF132E3CD0A100FF6743 /* extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = extensions.swift; sourceTree = "<group>"; };
 		3B757F4B2E54573100567756 /* utitool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = utitool; sourceTree = BUILT_PRODUCTS_DIR; };
-		3BA6A4EA2E492FD80066BDB7 /* stdio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = stdio.swift; sourceTree = "<group>"; };
+		3B757F6A2E5491BF00567756 /* cli.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = cli.swift; path = clicore/cli.swift; sourceTree = SOURCE_ROOT; };
+		3B757F6B2E5491BF00567756 /* path.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = path.swift; path = clicore/path.swift; sourceTree = SOURCE_ROOT; };
+		3B757F6C2E5491BF00567756 /* processes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = processes.swift; path = clicore/processes.swift; sourceTree = SOURCE_ROOT; };
+		3B757F6D2E5491BF00567756 /* stdio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = stdio.swift; path = clicore/stdio.swift; sourceTree = SOURCE_ROOT; };
 		3BA6A4ED2E4930210066BDB7 /* LICENSE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = "<group>"; };
 		3BA6A4EE2E4930210066BDB7 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		3BD947CC2E50E27C00A3245D /* cli.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = cli.swift; sourceTree = "<group>"; };
 		3BD947CE2E50F2EE00A3245D /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
-		3BDDE23E2E3E299800BB8AD4 /* processes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = processes.swift; sourceTree = "<group>"; };
 		3BDDE2402E3E672100BB8AD4 /* entities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = entities.swift; sourceTree = "<group>"; };
 		3BEC96BA2E4771E100F541D5 /* uti.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = uti.swift; sourceTree = "<group>"; };
-		3BEC96BC2E47725F00F541D5 /* path.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = path.swift; sourceTree = "<group>"; };
 		5A5688E725ADFFC4002293E8 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		5A5688EF25AE001C002293E8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -84,10 +84,10 @@
 				3BEC96BA2E4771E100F541D5 /* uti.swift */,
 				3BDDE2402E3E672100BB8AD4 /* entities.swift */,
 				3B42AF132E3CD0A100FF6743 /* extensions.swift */,
-				3BD947CC2E50E27C00A3245D /* cli.swift */,
-				3BEC96BC2E47725F00F541D5 /* path.swift */,
-				3BA6A4EA2E492FD80066BDB7 /* stdio.swift */,
-				3BDDE23E2E3E299800BB8AD4 /* processes.swift */,
+				3B757F6A2E5491BF00567756 /* cli.swift */,
+				3B757F6B2E5491BF00567756 /* path.swift */,
+				3B757F6C2E5491BF00567756 /* processes.swift */,
+				3B757F6D2E5491BF00567756 /* stdio.swift */,
 				5A5688EF25AE001C002293E8 /* Info.plist */,
 			);
 			path = utitool;
@@ -152,13 +152,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				3BEC96BB2E4771E100F541D5 /* uti.swift in Sources */,
-				3BDDE23F2E3E299800BB8AD4 /* processes.swift in Sources */,
-				3BA6A4EB2E492FD80066BDB7 /* stdio.swift in Sources */,
 				5A5688E825ADFFC4002293E8 /* main.swift in Sources */,
-				3BD947CD2E50E27C00A3245D /* cli.swift in Sources */,
+				3B757F6E2E5491BF00567756 /* stdio.swift in Sources */,
+				3B757F6F2E5491BF00567756 /* path.swift in Sources */,
+				3B757F702E5491BF00567756 /* processes.swift in Sources */,
+				3B757F712E5491BF00567756 /* cli.swift in Sources */,
 				3BDDE2412E3E672100BB8AD4 /* entities.swift in Sources */,
 				3B42AF142E3CD0A100FF6743 /* extensions.swift in Sources */,
-				3BEC96BD2E47725F00F541D5 /* path.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -293,7 +293,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 52;
+				CURRENT_PROJECT_VERSION = 53;
 				DEAD_CODE_STRIPPING = YES;
 				DSTROOT = $SRCROOT/build/pkgroot;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -316,7 +316,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Manual;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 52;
+				CURRENT_PROJECT_VERSION = 53;
 				DEAD_CODE_STRIPPING = YES;
 				DSTROOT = $SRCROOT/build/pkgroot;
 				ENABLE_HARDENED_RUNTIME = YES;
