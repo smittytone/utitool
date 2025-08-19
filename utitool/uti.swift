@@ -26,6 +26,7 @@
 
 import Foundation
 import UniformTypeIdentifiers
+import Clicore
 
 
 struct Uti {
