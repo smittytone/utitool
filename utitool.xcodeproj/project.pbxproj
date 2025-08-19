@@ -81,12 +81,12 @@
 			isa = PBXGroup;
 			children = (
 				5A5688E725ADFFC4002293E8 /* main.swift */,
-				3BD947CC2E50E27C00A3245D /* cli.swift */,
-				3BEC96BC2E47725F00F541D5 /* path.swift */,
-				3BA6A4EA2E492FD80066BDB7 /* stdio.swift */,
 				3BEC96BA2E4771E100F541D5 /* uti.swift */,
 				3BDDE2402E3E672100BB8AD4 /* entities.swift */,
 				3B42AF132E3CD0A100FF6743 /* extensions.swift */,
+				3BD947CC2E50E27C00A3245D /* cli.swift */,
+				3BEC96BC2E47725F00F541D5 /* path.swift */,
+				3BA6A4EA2E492FD80066BDB7 /* stdio.swift */,
 				3BDDE23E2E3E299800BB8AD4 /* processes.swift */,
 				5A5688EF25AE001C002293E8 /* Info.plist */,
 			);
