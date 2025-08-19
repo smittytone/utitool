@@ -42,23 +42,7 @@ if ProcessInfo.processInfo.operatingSystemVersion.majorVersion < 11 {
     Stdio.reportErrorAndExit("utitool requires macOS 11 or above")
 }
 
-// Trap CTRL-C
-// Make sure the signal does not terminate the application
-signal(SIGINT, SIG_IGN)
-
-// Set up an event source for SIGINT...
-Stdio.dispatchSource = DispatchSource.makeSignalSource(signal: SIGINT, queue: DispatchQueue.main)
-
-// ...add an event handler (from above)...
-Stdio.dispatchSource?.setEventHandler {
-    Stdio.write(message: Cli.CtrlCMessage, to: Stdio.ShellRoutes.Error)
-    Stdio.reportWarning("utitool interrupted -- halting")
-    Stdio.dispatchSource?.cancel()
-    exit(Cli.CtrlCExitCode)
-}
-
-// ...and start the event flow
-Stdio.dispatchSource?.resume()
+Stdio.enableCtrlHandler("utitool interrupted -- halting")
 
 // FROM 1.2.0
 // Check for a colour shift
@@ -127,9 +111,11 @@ if args.count == 1 {
                     doOutputJson = true
                 case "-h", "-help", "--help":
                     showHelp()
+                    Stdio.disableCtrlHandler()
                     exit(EXIT_SUCCESS)
                 case "--version":
                     showHeader()
+                    Stdio.disableCtrlHandler()
                     exit(EXIT_SUCCESS)
                 default:
                     if argument.prefix(1) == "-" {
@@ -205,7 +191,7 @@ if args.count == 1 {
 }
 
 // Exit gracefully
-Stdio.dispatchSource?.cancel()
+Stdio.disableCtrlHandler()
 exit(EXIT_SUCCESS)
 
 
