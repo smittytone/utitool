@@ -27,14 +27,14 @@
 import Foundation
 
 
-// MARK: - Global Variables
+// MARK: Global Variables
 
 var doOutputJson: Bool = false
 var showMoreInfo: Bool = false
 var highlightColour: String = String(Stdio.ShellColour.yellow)
 
 
-// MARK: - Runtime Start
+// MARK: Runtime Start
 
 // FROM 1.2.0
 // Will this ever be shown? I wish I had an old Mac to try it on!
@@ -42,6 +42,7 @@ if ProcessInfo.processInfo.operatingSystemVersion.majorVersion < 11 {
     Stdio.reportErrorAndExit("utitool requires macOS 11 or above")
 }
 
+// Set up Ctrl-C handling
 Stdio.enableCtrlHandler("utitool interrupted -- halting")
 
 // FROM 1.2.0
@@ -195,7 +196,7 @@ Stdio.disableCtrlHandler()
 exit(EXIT_SUCCESS)
 
 
-// MARK: - Help/Info Functions
+// MARK: Help and Info Functions
 
 /**
  Display help information.
