@@ -8,6 +8,8 @@ macOS’ Launch Services registry data for UTIs or apps can also be viewed in ma
 
 *utitool* requires macOS 11.5 ‘Big Sur’ or above.
 
+Building *utitool* from source requires my [Clicore Swift Package](https://github.com/smittytone/clicore).
+
 For more details, and full usage information, [please see my website](https://smittytone.net/utitool/index.html).
 
 ## Release Notes ##

@@ -2,7 +2,7 @@
 
 - 1.2.2 *Unreleased*
     - Add `man` page.
-    - Bring more `STDIO` functionality into `Stdio.swift`.
+    - Use `Clicore` for common CLI and Stdio functionality.
 - 1.2.1 *17 August 2025*
     - Support combined command line switches, eg. `-lj` (list UTIs, output to JSON).
     - Under-the-hood non-functional changes: namespace more files using structs.
