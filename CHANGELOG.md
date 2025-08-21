@@ -1,6 +1,6 @@
 ## Release Notes ##
 
-- 1.2.2 *Unreleased*
+- 1.2.2 *21 August 2025*
     - Add `man` page.
     - Use `Clicore` for common CLI and Stdio functionality.
 - 1.2.1 *17 August 2025*
