@@ -89,7 +89,7 @@
 				3B8812B22E550F100023DDF1 /* LICENSE.md */,
 			);
 			path = Misc;
-			sourceTree = "<group>";
+			sourceTree = SOURCE_ROOT;
 		};
 		3B8812B52E550F270023DDF1 /* manpage */ = {
 			isa = PBXGroup;
@@ -307,7 +307,9 @@
 				DSTROOT = $SRCROOT/build/pkgroot;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = utitool/Info.plist;
+				MACOSX_DEPLOYMENT_TARGET = 12.4;
 				MARKETING_VERSION = 1.2.2;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = com.bps.utitool;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -330,6 +332,7 @@
 				DSTROOT = $SRCROOT/build/pkgroot;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = utitool/Info.plist;
+				MACOSX_DEPLOYMENT_TARGET = 12.4;
 				MARKETING_VERSION = 1.2.2;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = com.bps.utitool;
