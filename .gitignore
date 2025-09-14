@@ -3,6 +3,7 @@
 ## Build generated
 build/
 DerivedData/
+pkgroot/
 
 ## Various settings
 *.pbxuser
