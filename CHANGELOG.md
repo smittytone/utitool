@@ -1,5 +1,8 @@
 ## Release Notes ##
 
+- 1.2.3 *Unreleased*
+    - Update to `Clicore 0.2.0`.
+    - Project build structure changes.
 - 1.2.2 *21 August 2025*
     - Add `man` page.
     - Use `Clicore` for common CLI and Stdio functionality.
