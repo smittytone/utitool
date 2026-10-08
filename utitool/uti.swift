@@ -24,7 +24,7 @@
     SOFTWARE.
 */
 
-import Foundation
+import AppKit
 import UniformTypeIdentifiers
 import Clicore
 
@@ -32,7 +32,7 @@ import Clicore
 extension Utitool {
 
     // MARK: Single Extension and UTI Look-up Functions
-    
+
     /**
      Using the supplied file extension, extract and display system UTI information.
 
@@ -45,7 +45,7 @@ extension Utitool {
 
      - Returns: An app exit code: success (0) or failure (1).
      */
-    internal static func getExtensionData(_ fileExtension: String, _ settings: Settings) -> Int32 {
+    internal static func getExtensionData(_ fileExtension: String, _ settings: Settings) {
 
         // Just in case the user supplied an extension with a dot
         var extn = fileExtension
@@ -62,31 +62,16 @@ extension Utitool {
                     let head = "\(index + 1). \(String(.bold))\(utiType.identifier)\(String(.normal))"
                     let inset = head.components(separatedBy: ". ")[0].count + 2
                     Stdio.report(head)
-                    outputDescription(utiType, inset)
-
-                    if utiType.tags.count > 0 {
-                        outputMimeTypes(utiType.tags, inset)
-                    }
-
-                    outputRefUrl(utiType)
-                    outputStatus(utiType, inset)
+                    showUtiData(utiType, false, inset)
                 }
             } else {
                 Stdio.report("UTI: \(String(.bold))\(utiTypes[0].identifier)\(String(.normal))")
+                showUtiData(utiTypes[0], false)
                 outputDescription(utiTypes[0])
-
-                if utiTypes[0].tags.count > 0 {
-                    outputMimeTypes(utiTypes[0].tags)
-                }
-
-                outputRefUrl(utiTypes[0])
-                outputStatus(utiTypes[0])
             }
         } else {
             Stdio.report("No info available for extension .\(extn)")
         }
-
-        return EXIT_SUCCESS
     }
 
 
@@ -94,33 +79,51 @@ extension Utitool {
      Using the supplied UTI, extract and display system information.
 
      - Parameters:
-        - uti:        The specified UTI.
+        - utiTest:    The specified UTI.
         - doShowHead: Include the UTI name as a heading.
         - settings:   The current processing settings.
 
      - Returns: An app exit code: success (0) or failure (1).
      */
-    internal static func getUtiData(_ uti: String, _ doShowHead: Bool, _ settings: Settings) -> Int32 {
+    internal static func getUtiData(_ utiText: String, _ doShowHead: Bool, _ settings: Settings) {
 
-        if let utiType = UTType(uti) {
+        if let uti = UTType(utiText) {
             if doShowHead {
-                Stdio.report("\(String(.bold))Information for UTI \(settings.highlightColour)\(utiType.identifier)\(String(.normal))")
+                Stdio.report("\(String(.bold))Information for UTI \(settings.highlightColour)\(uti.identifier)\(String(.normal))")
             }
 
-            outputDescription(utiType)
-
-            if utiType.tags.count > 0 {
-                outputFileExtensions(utiType.tags)
-                outputMimeTypes(utiType.tags)
-            }
-
-            outputStatus(utiType)
-            outputRefUrl(utiType)
+            showUtiData(uti)
         } else {
-            Stdio.report("UTI \(String(.bold))\(uti)\(String(.normal)) is not known to the system")
+            Stdio.report("UTI \(String(.bold))\(utiText)\(String(.normal)) is not known to the system")
+        }
+    }
+
+
+    /**
+     Show all the information for a specific UTI.
+
+     - Parameters:
+        - utiType:              The UTI to display.
+        - includeExtensionInfo: Show information on file extensions.
+        - inset:                The number of spaces, if any, to indent the readout.
+     */
+    private static func showUtiData(_ uti: UTType, _ includeExtensionInfo: Bool = true, _ inset: Int = 0) {
+
+        outputDescription(uti, inset)
+
+        if uti.tags.count > 0 {
+            if includeExtensionInfo {
+                outputFileExtensions(uti.tags, inset)
+            }
+
+            outputMimeTypes(uti.tags, inset)
         }
 
-        return EXIT_SUCCESS
+        outputRefUrl(uti, inset)
+        outputStatus(uti, inset)
+        // FROM 2.0.0
+        outputDefaultApp(uti, inset)
+        outputAllApps(uti, inset)
     }
 
 
@@ -170,12 +173,8 @@ extension Utitool {
         // Add the tag values
         if let value = tags[tagClass] {
             if value.count > 0 {
-                var items = ""
-                for item in value {
-                    items += item + ", "
-                }
-
-                Stdio.report("\(String(repeating: " ", count: addSpaces))\(tagText.capitaliseFirst()) registered: \(items.dropLast(2))")
+                let items = value.joined(separator: ", ")
+                Stdio.report("\(String(repeating: " ", count: addSpaces))\(tagText.capitaliseFirst()) registered: \(items)")
             } else {
                 Stdio.report("\(String(repeating: " ", count: addSpaces))No \(tagText) registered")
             }
@@ -218,11 +217,62 @@ extension Utitool {
 
 
     /**
-     Output to STD ERR a UTI's description, if it has one.
+     Output to STD ERR a UTI's default application.
 
      - Parameters:
         - utiType:  The UTI as a `UTType` instance.
         - addSpace: Add a four-space prefix. Default: false.
+     */
+    internal static func outputDefaultApp(_ utiType: UTType, _ addSpaces: Int = 0) {
+
+        guard let appURL = NSWorkspace.shared.urlForApplication(toOpen: utiType) else {
+            Stdio.report("\(String(repeating: " ", count: addSpaces))Default app: None")
+            return
+        }
+
+        var bundleID = "unknown"
+        if let bundle = Bundle(url: appURL), let bid = bundle.bundleIdentifier {
+            bundleID = bid
+        }
+
+        Stdio.report("\(String(repeating: " ", count: addSpaces))Default app: \(String(.underline))\(appURL.lastPathComponent.dropLast(4))\(String(.normal)) (\(bundleID))")
+    }
+
+
+    /**
+     Output to STD ERR a UTI's default application.
+
+     - Parameters:
+        - utiType:  The UTI as a `UTType` instance.
+        - addSpace: Add a four-space prefix. Default: false.
+     */
+    internal static func outputAllApps(_ utiType: UTType, _ addSpaces: Int = 0) {
+
+        var appURLs = NSWorkspace.shared.urlsForApplications(toOpen: utiType)
+        if appURLs.count > 0, let defaultAppURL = NSWorkspace.shared.urlForApplication(toOpen: utiType) {
+            appURLs = appURLs.filter {
+                $0 != defaultAppURL
+            }
+        }
+
+        if !appURLs.isEmpty {
+            let apps: [String] = appURLs.map {
+                return String($0.lastPathComponent.dropLast(4))
+            }
+
+            let appList = apps.joined(separator: ", ")
+            Stdio.report("\(String(repeating: " ", count: addSpaces))Other supporting apps: \(String(.underline))\(appList)\(String(.normal))")
+        }
+    }
+
+
+
+    /**
+     Output to STD ERR a UTI's description, if it has one.
+
+     - Parameters:
+     - utiType:  The UTI as a `UTType` instance.
+     - addSpace: Add a four-space prefix. Default: false.
      */
     internal static func outputDescription(_ utiType: UTType, _ addSpaces: Int = 0) {
 
@@ -241,10 +291,10 @@ extension Utitool {
      and, if requested, apps claiming those UTIs.
 
      - Parameters:
-        - listByApp: Should we also record apps? Default: false.
-        - settings:  Current processing settings.
+     - listByApp: Should we also record apps? Default: false.
+     - settings:  Current processing settings.
      */
-    internal static func readLaunchServicesRegister(_ listByApp: Bool = false, _ settings: Settings) async {
+    internal static func readLaunchServicesRegister(_ listByApp: Bool = false, _ settings: Settings) {
 
         /* This is a typical record from `lsregister -dump`
 
@@ -262,11 +312,12 @@ extension Utitool {
          */
 
         // Tell the user what's happening
-        Stdio.write(message: "Obtaining Launch Services’ registry data", to: Stdio.ShellRoutes.Error)
+        Stdio.write(message: "Obtaining Launch Services’ registry data. This can take some time ", to: Stdio.ShellRoutes.Error)
 
         // Set up and start the activity display timer
-        let cursorTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { time in
-            Stdio.write(message: ".", to: Stdio.ShellRoutes.Error)
+        let cursorTimer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { time in
+            //Stdio.write(message: Stdio.ShellCursor.Backspace, to: Stdio.ShellRoutes.Error)
+            Stdio.write(message: "•", to: Stdio.ShellRoutes.Error)
         }
 
         let recordPrefix = "type id"
@@ -277,7 +328,7 @@ extension Utitool {
 
 
         // Get the data
-        let (errCode, data, _) = await Processes.runProcessAsync(app: "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister", with: ["-dump"])
+        let (errCode, data) = Processes.runProcess(app: "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister", with: ["-dump"])
 
         // Check `data` for error conditions
         if errCode != EXIT_SUCCESS {
@@ -541,66 +592,61 @@ extension Utitool {
 
 
     /**
-     Shutdown the timer and clear the line.
-     */
-    internal static func clearTimer(_ timer: Timer) {
+     Set an known UTI's default app.
 
-        timer.invalidate()
-        Stdio.write(message:"\(Stdio.ShellCursor.Clearline)\r", to: Stdio.ShellRoutes.Error)
+     - Parameters:
+        - settings: The current processing settings.
+
+     - Return: Success (the messsage to output), or failure (an error)
+     */
+    internal static func setDefaultApp(_ settings: Settings) async -> Result<String, SetError> {
+
+        // TODO allow these to be either way round
+        let uti = settings.files[0]
+        var app = settings.files[1]
+
+        // Process the app name or path, to expand it
+        if !app.hasPrefix("/") {
+            // Convert an app name to a path
+            guard let appPath = getAppPath(app) else {
+                return .failure(SetError(code: .badApp, text: "could not determine path to app \(app)"))
+            }
+
+            app = appPath
+        } else {
+            if !app.hasSuffix(".app") {
+                app.append(".app")
+            }
+        }
+
+        // Get the key data
+        let ws = NSWorkspace.shared
+        guard let appID = getAppBundleID(app) else { return .failure(SetError(code: .badBundle, text: app))}
+        guard let utiType = UTType(uti) else { return .failure(SetError(code: .badUTI, text: uti))}
+        guard let appURL = ws.urlForApplication(withBundleIdentifier: appID) else {
+            return .failure(SetError(code: .badApp, text: "could not access app \(app)"))
+        }
+
+        // Attempt to set the default app
+        try? await ws.setDefaultApplication(at: appURL, toOpen: utiType)
+        return .success("UTI \(uti) set to application \(appURL.lastPathComponent.dropLast(4)) (\(appID))")
     }
 
 
     /**
-     Generate an array of strings by adding only those members of one array
-     that are not present in a second array to the second array.
+     Determine an app's Bundle ID.
 
      - Parameters:
-        - arrayA: An array of strings.
-        - arrayB: The array into which the new, unique members are to be added.
+        - verifiedAppPath: The path to the app.
 
-     - Returns: The combined array,
+     - Returns: The app's bundle ID, or `nil` on error.
      */
-    internal static func dedupeStrings(_ arrayA: [String], _ arrayB: [String]) -> [String] {
+    internal static func getAppBundleID(_ verifiedAppPath: String) -> String? {
 
-        var arrayC: [String] = arrayB
-        var modified = false
-        for item in arrayA {
-            var got = false
-            if arrayC.contains(item) {
-                got = true
-            }
-
-            if !got {
-                arrayC.append(item)
-                modified = true
-            }
+        if let bundleID = Bundle(path: verifiedAppPath)?.bundleIdentifier {
+            return bundleID
         }
 
-        return modified ? arrayC : arrayB
-    }
-
-
-    /**
-     Generate a human-readable list of comma-separated strings from
-     an array of strings.
-
-     - Parameters:
-        - items: The source array.
-
-     - Returns: A comma-separated list.
-
-     */
-   internal static func listify(_ items: [String]) -> String {
-
-        if items.isEmpty {
-            return ""
-        }
-
-        var text = ""
-        for item in items {
-            text += item + ", "
-        }
-
-        return String(text[...].dropLast(2))
+        return nil
     }
 }

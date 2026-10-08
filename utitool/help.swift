@@ -41,22 +41,24 @@ extension Utitool {
             and to view what information macOS holds about UTIs and the apps that claim them.
             
             \(String(.bold))USAGE\(String(.normal))
-                utitool [--more/-m] [path 1] [path 2] ... [path \(String(.italic))n\(String(.normal))] View specific files’ UTIs.
-                        [--uti/-u [UTI]]                           View data for a specific UTI.
+                utitool [--more/-m] {path 1} {path 2} ... [path \(String(.italic))n\(String(.normal))] View specific files’ UTIs.
+                        [--uti/-u {UTI}]                           View data for a specific UTI.
                         [--extension/-e {file extension}]          View data for a specific file extension.
                         [--list/-l] [--json/-j]                    List system UTI data, with optional JSON output.
                         [--apps/-a] [--json/-j]                    List system app data, with optional JSON output.
+                        [--set/-s] {UTI} {app name|path}]          Set the default app for the specified UTI.
             
             \r\n\(String(.bold))EXAMPLES\(String(.normal))
-                utitool text.md                     Get UTI for a named file in the current directory.
-                utitool -m text.md                  Get extended UTI info for a named file in the current directory.
-                utitool text1.md text2.md           Get UTIs for named files in the current directory.
-                utitool -m *                        Get extended UTI info for all the files in the current directory.
-                utitool -e md                       Get data about UTIs associated with the file extenions \(String(.italic))md\(String(.normal)).
-                utitool -u com.bps.rust-source      Get data about UTIs associated with the UTI \(String(.italic))com.bps.rust-source\(String(.normal)).
-                utitool -l                          View human-readable UTI information held by macOS.
-                utitool -a                          View human-readable app information held by macOS.
-                utitool -l -j                       Output pipeable UTI information held by macOS in JSON.
+                utitool text.md                       Get UTI for a named file in the current directory.
+                utitool -m text.md                    Get extended UTI info for a named file in the current directory.
+                utitool text1.md text2.md             Get UTIs for named files in the current directory.
+                utitool -m *                          Get extended UTI info for all the files in the current directory.
+                utitool -e md                         Get data about UTIs associated with the file extenions \(String(.italic))md\(String(.normal)).
+                utitool -u com.bps.rust-source        Get data about UTIs associated with the UTI \(String(.italic))com.bps.rust-source\(String(.normal)).
+                utitool -l                            View human-readable UTI information held by macOS.
+                utitool -a                            View human-readable app information held by macOS.
+                utitool -l -j                         Output pipeable UTI information held by macOS in JSON.
+                utitool -s com.bps.rust-source Xcode  Set Xcode as the default app for Rust files.
             
             \(String(.italic))https://smittytone.net/utitool/index.html\(String(.normal))
             """

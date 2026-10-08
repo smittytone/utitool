@@ -73,9 +73,11 @@ struct Utitool {
 
                     switch requiresValue {
                         case 1:
-                            Stdio.exitApp(getExtensionData(argument, settings))
+                            getExtensionData(argument, settings)
+                            Stdio.exitApp()
                         case 2:
-                            Stdio.exitApp(getUtiData(argument, true, settings))
+                            getUtiData(argument, true, settings)
+                            Stdio.exitApp()
                         default:
                             break
                     }
@@ -99,6 +101,8 @@ struct Utitool {
                         settings.doLaunchServicesReadApps = true
                     case "--json", "-j":
                         settings.doOutputJson = true
+                    case "--set", "-s":
+                        settings.doSetDefaultApp = true
                     case "-h", "-help", "--help":
                         showHelp()
                         Stdio.exitApp()
@@ -119,13 +123,36 @@ struct Utitool {
                 }
             }
 
+            // FROM 2.0.0
+            // Set a default app
+            if settings.doSetDefaultApp {
+                if settings.files.count != 2 {
+                    Stdio.reportErrorAndExit("Missing the UTI and/or default app")
+                }
+
+                switch await setDefaultApp(settings) {
+                    case .failure(let error):
+                        Stdio.reportErrorAndExit("\(error.localizedDescription)")
+                    case .success(let message):
+                        Stdio.report(message)
+                        Stdio.exitApp()
+                }
+            }
+
             // Run initial LSServices functions
+            if settings.doLaunchServicesReadUtis && settings.doLaunchServicesReadApps {
+                // There can be only one...
+                settings.doLaunchServicesReadApps = false
+            }
+
             if settings.doLaunchServicesReadApps {
-                await readLaunchServicesRegister(true, settings)
+                readLaunchServicesRegister(true, settings)
+                Stdio.exitApp()
             }
 
             if settings.doLaunchServicesReadUtis {
-                await readLaunchServicesRegister(false, settings)
+                readLaunchServicesRegister(false, settings)
+                Stdio.exitApp()
             }
 
             // Convert passed paths to URLs for processing
@@ -156,7 +183,7 @@ struct Utitool {
 
                             if settings.showMoreInfo {
                                 Stdio.report("UTI for \(settings.highlightColour)\(path)\(String(.normal)) is \(settings.highlightColour)\(uti)\(String(.normal))")
-                                _ = getUtiData(uti, false, settings)
+                                getUtiData(uti, false, settings)
                             } else {
                                 Stdio.report("UTI for \(settings.highlightColour)\(path)\(String(.normal)) is \(settings.highlightColour)\(uti)\(String(.normal)) (\(extra))")
                             }

@@ -82,6 +82,9 @@ struct UtiRecordShort: Encodable {
 }
 
 
+/*
+ Record to hold processing-oriented variables in new cli code format.
+ */
 struct Settings {
 
     var doOutputJson: Bool                  = false
@@ -90,4 +93,42 @@ struct Settings {
     var files: [String]                     = []
     var doLaunchServicesReadApps: Bool      = false
     var doLaunchServicesReadUtis: Bool      = false
+    var doSetDefaultApp: Bool               = false
+}
+
+
+/*
+ Processing outcome error value.
+ */
+public struct SetError: Error, LocalizedError {
+
+    public var code: SetErrorKind           = .noError
+    public var text: String                 = "unknown"
+    public var errorDescription: String? {
+        switch self.code {
+            case .noError:
+                return nil
+            case .badUTI:
+                return "system did not recognise UTI \(text)"
+            case .badApp:
+                return "\(text)"
+            case .badSet:
+                return "could not set \(text)"
+            case .badBundle:
+                return "cound not get the bundle ID of app \(text)"
+        }
+    }
+}
+
+
+/*
+ Processing error types.
+ */
+public enum SetErrorKind: Int, Error {
+
+    case noError                            = 0
+    case badUTI                             = 1
+    case badApp                             = 2
+    case badSet                             = 3
+    case badBundle                          = 4
 }

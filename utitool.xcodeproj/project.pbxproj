@@ -12,6 +12,7 @@
 		3B8812AB2E550E910023DDF1 /* utitool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B8812A62E550E910023DDF1 /* utitool.swift */; };
 		3B8812AC2E550E910023DDF1 /* uti.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B8812A72E550E910023DDF1 /* uti.swift */; };
 		3B8812AF2E550EC40023DDF1 /* Clicore in Frameworks */ = {isa = PBXBuildFile; productRef = 3B8812AE2E550EC40023DDF1 /* Clicore */; };
+		3B9437723077B04A005F2CB3 /* utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B9437713077B047005F2CB3 /* utilities.swift */; };
 		3BAF65BD307773E10066FBFB /* help.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BAF65BC307773DE0066FBFB /* help.swift */; };
 		3BAF65C0307782C50066FBFB /* swift_version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BAF65BF307782C50066FBFB /* swift_version.swift */; };
 /* End PBXBuildFile section */
@@ -39,6 +40,7 @@
 		3B8812B22E550F100023DDF1 /* LICENSE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = SOURCE_ROOT; };
 		3B8812B32E550F100023DDF1 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 		3B8812B42E550F270023DDF1 /* utitool.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = utitool.1; sourceTree = "<group>"; };
+		3B9437713077B047005F2CB3 /* utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = utilities.swift; sourceTree = "<group>"; };
 		3BAF65BC307773DE0066FBFB /* help.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = help.swift; sourceTree = "<group>"; };
 		3BAF65BF307782C50066FBFB /* swift_version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = swift_version.swift; sourceTree = "<group>"; };
 		3BAF65C1307782F20066FBFB /* swift.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = swift.plist; sourceTree = "<group>"; };
@@ -82,6 +84,7 @@
 				3B8812A62E550E910023DDF1 /* utitool.swift */,
 				3BAF65BC307773DE0066FBFB /* help.swift */,
 				3B8812A72E550E910023DDF1 /* uti.swift */,
+				3B9437713077B047005F2CB3 /* utilities.swift */,
 				3B8812A32E550E910023DDF1 /* entities.swift */,
 				3B8812A42E550E910023DDF1 /* extensions.swift */,
 				3B8812A52E550E910023DDF1 /* Info.plist */,
@@ -200,6 +203,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3B8812A92E550E910023DDF1 /* entities.swift in Sources */,
+				3B9437723077B04A005F2CB3 /* utilities.swift in Sources */,
 				3B8812AA2E550E910023DDF1 /* extensions.swift in Sources */,
 				3BAF65BD307773E10066FBFB /* help.swift in Sources */,
 				3B8812AB2E550E910023DDF1 /* utitool.swift in Sources */,
@@ -342,7 +346,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 58;
+				CURRENT_PROJECT_VERSION = 61;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = Y5J3K52DNA;
@@ -369,7 +373,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				CURRENT_PROJECT_VERSION = 58;
+				CURRENT_PROJECT_VERSION = 61;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = Y5J3K52DNA;
