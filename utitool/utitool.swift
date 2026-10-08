@@ -2,7 +2,7 @@
     utitool
     main.swift
 
-    Copyright © 2025 Tony Smith. All rights reserved.
+    Copyright © 2026 Tony Smith. All rights reserved.
 
     MIT License
     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -28,141 +28,117 @@ import Foundation
 import Clicore
 
 
-// MARK: Global Variables
-
-var doOutputJson: Bool = false
-var showMoreInfo: Bool = false
-var highlightColour: String = String(Stdio.ShellColour.yellow)
-
-
 @main
 struct Utitool {
 
-    static func main() throws {
-
-        // FROM 1.2.0
-        // Will this ever be shown? I wish I had an old Mac to try it on!
-        if ProcessInfo.processInfo.operatingSystemVersion.majorVersion < 11 {
-            Stdio.reportErrorAndExit("utitool requires macOS 11 or above")
-        }
+    public static func main() async throws {
 
         // Set up Ctrl-C handling
         Stdio.enableCtrlHandler("utitool interrupted -- halting")
 
+        // FROM 2.0.0
+        var settings = Settings()
+
+#if os(macOS)
+        // Use emoji markers on macOS
+        Stdio.settings.useEmoji = true
+#endif
+
         // FROM 1.2.0
         // Check for a colour shift
         if let _ = ProcessInfo.processInfo.environment["UTITOOL_USE_DARK_COLOUR"] {
-            highlightColour = String(Stdio.ShellColour.blue)
+            settings.highlightColour = String(Stdio.ShellColour.blue)
         }
 
         // Get the command line args...
-        let args = Cli.unify(args: CommandLine.arguments)
+        let collatedArguments = Cli.unify(args: CommandLine.arguments)
 
         // ...and process them
-        if args.count == 1 {
+        if collatedArguments.count == 0 {
             // No user args? Just show the help info
             showHelp()
         } else {
-            // Get a file manager
-            let fm = FileManager.default
-            var count: UInt = 0
-            var argCount: UInt = 0
-            var argIsAValue: Bool = false
-            var prevArg: String = ""
-            var argType: Int = -1
-            var files: [String] = []
-            var doLaunchServicesReadApps: Bool = false
-            var doLaunchServicesReadUtis: Bool = false
-
             // Process the (separated) arguments
-            for argument in args {
-                // Ignore the first command line argument
-                if argCount == 0 {
-                    argCount += 1
-                    continue
-                }
-
-                if argIsAValue {
+            var previousArgument = ""
+            var requiresValue = -1
+            for argument in collatedArguments {
+                if requiresValue > 0 {
                     // Make sure we're not reading in an option rather than a value
                     if argument.prefix(1) == "-" {
-                        Stdio.reportErrorAndExit("Missing value for \(prevArg)")
+                        Stdio.reportErrorAndExit("Missing value for \(previousArgument)")
                     }
 
-                    argIsAValue = false
-
-                    switch argType {
+                    switch requiresValue {
                         case 1:
-                            exit(Uti.getExtensionData(argument, highlightColour))
+                            exit(getExtensionData(argument, settings))
                         case 2:
-                            exit(Uti.getUtiData(argument, true, highlightColour))
+                            exit(getUtiData(argument, true, settings))
                         default:
                             break
                     }
-                } else {
-                    switch argument {
-                        case "--extension", "-e":
-                            argIsAValue = true
-                            argType = 1
-                        case "--uti", "-u":
-                            argIsAValue = true
-                            argType = 2
-                        case "--more", "-m":
-                            showMoreInfo = true
-                        case "--list", "-l":
-                            doLaunchServicesReadUtis = true
-                        case "--apps", "-a":
-                            doLaunchServicesReadApps = true
-                        case "--json", "-j":
-                            doOutputJson = true
-                        case "-h", "-help", "--help":
-                            showHelp()
-                            Stdio.disableCtrlHandler()
-                            exit(EXIT_SUCCESS)
-                        case "--version":
-                            showHeader()
-                            Stdio.disableCtrlHandler()
-                            exit(EXIT_SUCCESS)
-                        default:
-                            if argument.prefix(1) == "-" {
-                                Stdio.reportErrorAndExit("Unknown argument: \(argument)")
-                            } else {
-                                files.append(argument)
-                            }
-                    }
 
-                    prevArg = argument
+                    requiresValue = -1
+                    continue
                 }
 
-                argCount += 1
+                switch argument {
+                    case "--extension", "-e":
+                        requiresValue = 1
+                        previousArgument = argument
+                    case "--uti", "-u":
+                        requiresValue = 2
+                        previousArgument = argument
+                    case "--more", "-m":
+                        settings.showMoreInfo = true
+                    case "--list", "-l":
+                        settings.doLaunchServicesReadUtis = true
+                    case "--apps", "-a":
+                        settings.doLaunchServicesReadApps = true
+                    case "--json", "-j":
+                        settings.doOutputJson = true
+                    case "-h", "-help", "--help":
+                        showHelp()
+                        Stdio.exitApp()
+                    case "--version":
+                        showHeader()
+                        Stdio.exitApp()
+                    default:
+                        if argument.prefix(1) == "-" {
+                            Stdio.reportErrorAndExit("Unknown argument: \(argument)")
+                        } else {
+                            settings.files.append(argument)
+                        }
+                }
 
                 // Trap commands that come last and therefore have missing args
-                if argCount == CommandLine.arguments.count && argIsAValue {
-                    Stdio.reportErrorAndExit("Missing value for \(argument)")
+                if requiresValue > 0 && argument == collatedArguments.last {
+                    Stdio.reportErrorAndExit("Missing value for argument \(argument)")
                 }
             }
 
-            if doLaunchServicesReadApps {
-                Uti.readLaunchServicesRegister(true, highlightColour)
+            if settings.doLaunchServicesReadApps {
+                await readLaunchServicesRegister(true, settings)
             }
 
-            if doLaunchServicesReadUtis {
-                Uti.readLaunchServicesRegister(false, highlightColour)
+            if settings.doLaunchServicesReadUtis {
+                await readLaunchServicesRegister(false, settings)
             }
 
             // Convert passed paths to URL
-            if files.count > 0 {
-                for file in files {
+            var count = 0
+            if settings.files.count > 0 {
+                for file in settings.files {
                     let path = Path.getFullPath(file)
                     var isDir: ObjCBool = false
 
                     // Check that we're only dealing with files
-                    if fm.fileExists(atPath: path, isDirectory: &isDir) {
+                    if FileManager.default.fileExists(atPath: path, isDirectory: &isDir) {
                         if isDir.boolValue {
                             continue
                         }
 
                         // Make a URL from the path
-                        let url: URL = URL(fileURLWithPath: path, isDirectory: false)
+                        let url = URL(fileURLWithPath: path, isDirectory: false)
 
                         // And output the UTI if we can
                         if let uti = url.typeIdentifier {
@@ -173,11 +149,11 @@ struct Utitool {
                                 extra = "UTI was dynamically assigned"
                             }
 
-                            if showMoreInfo {
-                                Stdio.report("UTI for \(highlightColour)\(path)\(String(.normal)) is \(highlightColour)\(uti)\(String(.normal))")
-                                _ = Uti.getUtiData(uti, false, highlightColour)
+                            if settings.showMoreInfo {
+                                Stdio.report("UTI for \(settings.highlightColour)\(path)\(String(.normal)) is \(settings.highlightColour)\(uti)\(String(.normal))")
+                                _ = getUtiData(uti, false, settings)
                             } else {
-                                Stdio.report("UTI for \(highlightColour)\(path)\(String(.normal)) is \(highlightColour)\(uti)\(String(.normal)) (\(extra))")
+                                Stdio.report("UTI for \(settings.highlightColour)\(path)\(String(.normal)) is \(settings.highlightColour)\(uti)\(String(.normal)) (\(extra))")
                             }
                         } else {
                             Stdio.reportError("Could not get UTI for \(path)")
@@ -189,7 +165,7 @@ struct Utitool {
                         Stdio.reportError("\(path) is not a valid file reference")
                     }
                 }
-            } else if !doLaunchServicesReadApps && !doLaunchServicesReadUtis {
+            } else if !settings.doLaunchServicesReadApps && !settings.doLaunchServicesReadUtis {
                 // No reported files? Issue a warning
                 Stdio.report("No files specified or present")
             }

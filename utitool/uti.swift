@@ -2,7 +2,7 @@
     utitool
     uti.swift
 
-    Copyright © 2025 Tony Smith. All rights reserved.
+    Copyright © 2026 Tony Smith. All rights reserved.
 
     MIT License
     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -29,7 +29,7 @@ import UniformTypeIdentifiers
 import Clicore
 
 
-struct Uti {
+extension Utitool {
 
     // MARK: Single Extension and UTI Look-up Functions
     
@@ -39,13 +39,13 @@ struct Uti {
      The routine checks for a dot prefix on the extension and, if one is present,
      removes it.
 
-     - Parameters
-     - fileExtension:   The specified file extension.
-     - highlightColour: The current colour for printing title emphasis.
+     - Parameters:
+        - fileExtension: The specified file extension.
+        - settings:      The current processing settings.
 
-     - Returns An app exit code: success (0) or failure (1).
+     - Returns: An app exit code: success (0) or failure (1).
      */
-    static func getExtensionData(_ fileExtension: String, _ highlightColour: String) -> Int32 {
+    internal static func getExtensionData(_ fileExtension: String, _ settings: Settings) -> Int32 {
 
         // Just in case the user supplied an extension with a dot
         var extn = fileExtension
@@ -56,7 +56,7 @@ struct Uti {
         // Get UTI data from the extension
         let utiTypes = UTType.types(tag: extn, tagClass: .filenameExtension , conformingTo: nil)
         if utiTypes.count > 0 {
-            Stdio.report("\(String(.bold))UTI information for file extension \(highlightColour).\(extn)\(String(.normal))")
+            Stdio.report("\(String(.bold))UTI information for file extension \(settings.highlightColour).\(extn)\(String(.normal))")
             if utiTypes.count > 1 {
                 for (index, utiType) in utiTypes.enumerated() {
                     let head = "\(index + 1). \(String(.bold))\(utiType.identifier)\(String(.normal))"
@@ -93,18 +93,18 @@ struct Uti {
     /**
      Using the supplied UTI, extract and display system information.
 
-     - Parameters
-     - uti:             The specified UTI.
-     - doShowHead:      Include the UTI name as a heading.
-     - highlightColour: The current colour for printing title emphasis.
+     - Parameters:
+        - uti:        The specified UTI.
+        - doShowHead: Include the UTI name as a heading.
+        - settings:   The current processing settings.
 
-     - Returns An app exit code: success (0) or failure (1).
+     - Returns: An app exit code: success (0) or failure (1).
      */
-    static func getUtiData(_ uti: String, _ doShowHead: Bool, _ highlightColour: String) -> Int32 {
+    internal static func getUtiData(_ uti: String, _ doShowHead: Bool, _ settings: Settings) -> Int32 {
 
         if let utiType = UTType(uti) {
             if doShowHead {
-                Stdio.report("\(String(.bold))Information for UTI \(highlightColour)\(utiType.identifier)\(String(.normal))")
+                Stdio.report("\(String(.bold))Information for UTI \(settings.highlightColour)\(utiType.identifier)\(String(.normal))")
             }
 
             outputDescription(utiType)
@@ -127,11 +127,11 @@ struct Uti {
     /**
      Output to STD ERR a UTI's related MIME types.
 
-     - Parameters
-     - tags: The specified UTI's tags as a dictionary.
-     - addSpace: Add a four-space prefix. Default: false.
+     - Parameters:
+        - tags:     The specified UTI's tags as a dictionary.
+        - addSpace: Add a four-space prefix. Default: false.
      */
-    static func outputMimeTypes(_ tags:  [UTTagClass : [String]], _ addSpaces: Int = 0) {
+    internal static func outputMimeTypes(_ tags:  [UTTagClass : [String]], _ addSpaces: Int = 0) {
 
         outputTags(tags, .mimeType, addSpaces)
     }
@@ -140,11 +140,11 @@ struct Uti {
     /**
      Output to STD ERR a UTI's related file extensions.
 
-     - Parameters
-     - tags: The specified UTI's tags as a dictionary.
-     - addSpace: Add a four-space prefix. Default: false.
+     - Parameters:
+        - tags:     The specified UTI's tags as a dictionary.
+        - addSpace: Add a four-space prefix. Default: false.
      */
-    static func outputFileExtensions(_ tags:  [UTTagClass : [String]], _ addSpaces: Int = 0) {
+    internal static func outputFileExtensions(_ tags:  [UTTagClass : [String]], _ addSpaces: Int = 0) {
 
         outputTags(tags, .filenameExtension, addSpaces)
     }
@@ -153,13 +153,13 @@ struct Uti {
     /**
      Output to STD ERR a UTI's related tags by tag class.
 
-     - Parameters
-     - tags:     The specified UTI's tags as a dictionary.
-     - tagClass: The required tag class as a `UTTagClass`.
-     - addSpace: Add a four-space prefix. Default: false.
+     - Parameters:
+        - tags:     The specified UTI's tags as a dictionary.
+        - tagClass: The required tag class as a `UTTagClass`.
+        - addSpace: Add a four-space prefix. Default: false.
      */
 
-    static func outputTags(_ tags:  [UTTagClass : [String]], _ tagClass: UTTagClass, _ addSpaces: Int = 0) {
+    internal static func outputTags(_ tags:  [UTTagClass : [String]], _ tagClass: UTTagClass, _ addSpaces: Int = 0) {
 
         // Set the output text header
         var tagText = "file extensions"
@@ -188,11 +188,11 @@ struct Uti {
     /**
      Output to STD ERR a UTI's registration status.
 
-     - Parameters
-     - utiType: The UTI as a `UTType` instance.
-     - addSpace: Add a four-space prefix. Default: false.
+     - Parameters:
+        - utiType: The UTI as a `UTType` instance.
+        - addSpace: Add a four-space prefix. Default: false.
      */
-    static func outputStatus(_ utiType: UTType, _ addSpaces: Int = 0) {
+    internal static func outputStatus(_ utiType: UTType, _ addSpaces: Int = 0) {
 
         if utiType.isDeclared {
             Stdio.report("\(String(repeating: " ", count: addSpaces))UTI is registered with the system")
@@ -205,11 +205,11 @@ struct Uti {
     /**
      Output to STD ERR a UTI's reference URL.
 
-     - Parameters
-     - utiType: The UTI as a `UTType` instance.
-     - addSpace: Add a four-space prefix. Default: false.
+     - Parameters:
+        - utiType:  The UTI as a `UTType` instance.
+        - addSpace: Add a four-space prefix. Default: false.
      */
-    static func outputRefUrl(_ utiType: UTType, _ addSpaces: Int = 0) {
+    internal static func outputRefUrl(_ utiType: UTType, _ addSpaces: Int = 0) {
 
         if let url = utiType.referenceURL {
             Stdio.report("\(String(repeating: " ", count: addSpaces))Reference URL: \(String(.underline))\(url)\(String(.normal))")
@@ -220,11 +220,11 @@ struct Uti {
     /**
      Output to STD ERR a UTI's description, if it has one.
 
-     - Parameters
-     - utiType:  The UTI as a `UTType` instance.
-     - addSpace: Add a four-space prefix. Default: false.
+     - Parameters:
+        - utiType:  The UTI as a `UTType` instance.
+        - addSpace: Add a four-space prefix. Default: false.
      */
-    static func outputDescription(_ utiType: UTType, _ addSpaces: Int = 0) {
+    internal static func outputDescription(_ utiType: UTType, _ addSpaces: Int = 0) {
 
         if let desc = utiType.localizedDescription {
             Stdio.report("\(String(repeating: " ", count: addSpaces))Content type: \(desc)")
@@ -240,11 +240,11 @@ struct Uti {
      Read `lsregister` dumped output for UIT records and add to a list of UTIs
      and, if requested, apps claiming those UTIs.
 
-     - Parameters
-     - listByApp:       Should we also record apps? Default: false.
-     - highlightColour: The current colour for printing title emphasis.
+     - Parameters:
+        - listByApp: Should we also record apps? Default: false.
+        - settings:  Current processing settings.
      */
-    static func readLaunchServicesRegister(_ listByApp: Bool = false, _ highlightColour: String) {
+    internal static func readLaunchServicesRegister(_ listByApp: Bool = false, _ settings: Settings) async {
 
         /* This is a typical record from `lsregister -dump`
 
@@ -277,7 +277,7 @@ struct Uti {
 
 
         // Get the data
-        let (errCode, data) = runProcess(app: "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister", with: ["-dump"])
+        let (errCode, data, _) = await Processes.runProcessAsync(app: "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister", with: ["-dump"])
 
         // Check `data` for error conditions
         if errCode != EXIT_SUCCESS {
@@ -286,7 +286,7 @@ struct Uti {
 
         var locale: String.Index = recordPrefix.startIndex
         var scanned: String? = nil
-        let scanner: Scanner = Scanner(string: data)
+        let scanner = Scanner(string: data)
         scanner.charactersToBeSkipped = nil
 
         // Scan for UTI records
@@ -421,7 +421,7 @@ struct Uti {
         }
 
         // Write out the results
-        if doOutputJson {
+        if settings.doOutputJson {
             // User has asked for JSON output. This is sent to STD_OUT so it can be piped
             // to another tool, for example `jq`.
             do {
@@ -457,7 +457,7 @@ struct Uti {
                 // Iterate over that list and output the info
                 for key in sortedKeys {
                     let appRecord = apps[key]!
-                    Stdio.report("\(highlightColour)\(String(.bold))\(key)\(String(.normal)) is associated with the following UTIs:")
+                    Stdio.report("\(settings.highlightColour)\(String(.bold))\(key)\(String(.normal)) is associated with the following UTIs:")
                     if !appRecord.utis.isEmpty {
                         // Order the subsidiary UTI list
                         let orderedUtis = appRecord.utis.sorted { $0.uti < $1.uti }
@@ -474,7 +474,7 @@ struct Uti {
                 // Iterate over that list and output the info
                 for key in sortedKeys {
                     let utiRecord = utis[key]!
-                    Stdio.report("\(highlightColour)\(String(.bold))\(key)\(String(.normal))")
+                    Stdio.report("\(settings.highlightColour)\(String(.bold))\(key)\(String(.normal))")
                     if !utiRecord.extensions.isEmpty {
                         Stdio.report("    File extension\(utiRecord.extensions.count == 1 ? "" : "s"): \(listify(utiRecord.extensions))")
                     }
@@ -512,7 +512,7 @@ struct Uti {
 
      Clunky, but they're not marked as such.
      */
-    static func ignoreHardware(_ uti: String) -> Bool {
+    internal static func ignoreHardware(_ uti: String) -> Bool {
 
         let hardwareTypes = ["macbook", "ipad", "ipod", "iphone", "device", "homepod", "macpro", "watch", "macmini", "imac", "emac", "ios", "laptop", "power", "studio", "xserve", "tower", "rackmount", "pencil", "airpods", "airport", "airtag", "tv", "airdisk", "beats", "time-capsule", "storage-", "display", "accessory", "graphic-icon", "legacy", "icon-", "network", "alert", "vision-pro", "ibook", "-icon"]
 
@@ -543,7 +543,7 @@ struct Uti {
     /**
      Shutdown the timer and clear the line.
      */
-    static func clearTimer(_ timer: Timer) {
+    internal static func clearTimer(_ timer: Timer) {
 
         timer.invalidate()
         Stdio.write(message:"\(Stdio.ShellCursor.Clearline)\r", to: Stdio.ShellRoutes.Error)
@@ -554,18 +554,18 @@ struct Uti {
      Generate an array of strings by adding only those members of one array
      that are not present in a second array to the second array.
 
-     - Parameters
-     arrayA: An array of strings.
-     arrayB: The array into which the new, unique members are to be added.
+     - Parameters:
+        - arrayA: An array of strings.
+        - arrayB: The array into which the new, unique members are to be added.
 
-     - Returns The combined array,
+     - Returns: The combined array,
      */
-    static func dedupeStrings(_ arrayA: [String], _ arrayB: [String]) -> [String] {
+    internal static func dedupeStrings(_ arrayA: [String], _ arrayB: [String]) -> [String] {
 
         var arrayC: [String] = arrayB
-        var modified: Bool = false
+        var modified = false
         for item in arrayA {
-            var got: Bool = false
+            var got = false
             if arrayC.contains(item) {
                 got = true
             }
@@ -584,19 +584,19 @@ struct Uti {
      Generate a human-readable list of comma-separated strings from
      an array of strings.
 
-     - Parameters
-     items: The source array.
+     - Parameters:
+        - items: The source array.
 
-     - Returns A comma-separated list.
+     - Returns: A comma-separated list.
 
      */
-    static func listify(_ items: [String]) -> String {
+   internal static func listify(_ items: [String]) -> String {
 
         if items.isEmpty {
             return ""
         }
 
-        var text: String = ""
+        var text = ""
         for item in items {
             text += item + ", "
         }

@@ -2,7 +2,7 @@
     utitool
     extensions.swift
 
-    Copyright © 2025 Tony Smith. All rights reserved.
+    Copyright © 2026 Tony Smith. All rights reserved.
 
     MIT License
     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -32,25 +32,23 @@ extension URL {
 
     var typeIdentifier: String? {
 
-        // FROM 1.0.3
-        // Add support for Big Sur UTType functionality
-        if #available(macOS 11, *) {
-            let resourceValues: URLResourceValues? = try? resourceValues(forKeys: [.contentTypeKey])
-            if let uti: UTType = resourceValues!.contentType {
-                return uti.identifier
-            } else {
-                return nil
-            }
+        // FROM 1.3.0
+        // Min. macOS is 12
+        let resourceValues: URLResourceValues? = try? resourceValues(forKeys: [.contentTypeKey])
+        if let uti: UTType = resourceValues!.contentType {
+            return uti.identifier
         } else {
-            let resourceValues: URLResourceValues? = try? resourceValues(forKeys: [.typeIdentifierKey])
-            return resourceValues!.typeIdentifier
+            return nil
         }
     }
 
+
     var localizedName: String? {
+
         let resourceValues: URLResourceValues? = try? resourceValues(forKeys: [.localizedNameKey])
         return resourceValues!.localizedName
     }
+
 
     var known: Bool {
 
@@ -69,6 +67,7 @@ extension URL {
 extension String {
 
     func capitaliseFirst() -> String {
+
         return prefix(1).uppercased() + self.dropFirst()
     }
 }
@@ -80,10 +79,10 @@ extension Scanner {
      Look ahead and return the next character in the sequence without
      altering the current location of the scanner.
 
-     - Parameters
+     - Parameters:
         - in: The string being scanned.
 
-     - Returns The next character as a string.
+     - Returns: The next character as a string.
      */
     func getNextCharacter(in outer: String) -> String {
 
@@ -106,8 +105,8 @@ extension Scanner {
     /**
      Step over the next x characters.
 
-     - Parameters
-        count: The number of characters to skip
+     - Parameters:
+        - count: The number of characters to skip
      */
     func skipCharacters(_ count: Int) {
 

@@ -2,7 +2,7 @@
     utitool
     entities.swift
 
-    Copyright © 2025 Tony Smith. All rights reserved.
+    Copyright © 2026 Tony Smith. All rights reserved.
 
     MIT License
     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,7 +25,7 @@
 */
 
 import Foundation
-
+import Clicore
 
 /*
  App Record - data for an app capable of handling zero or more UTIs.
@@ -33,8 +33,9 @@ import Foundation
  future properties.
  */
 struct AppRecord: Encodable {
-    var name: String = ""
-    var utis: [UtiRecordShort] = []
+
+    var name: String                        = ""
+    var utis: [UtiRecordShort]              = []
 }
 
 
@@ -44,18 +45,20 @@ struct AppRecord: Encodable {
  the parent UTIs to which it conforms.
  */
 struct UtiRecord: Encodable {
-    var uti: String = ""
-    var apps: [AppRecord] = []
-    var extensions: [String] = []
-    var mimeTypes: [String] = []
-    var parents: [String] = []
-    var ref: String = ""
+
+    var uti: String                         = ""
+    var apps: [AppRecord]                   = []
+    var extensions: [String]                = []
+    var mimeTypes: [String]                 = []
+    var parents: [String]                   = []
+    var ref: String                         = ""
 
     /**
      Provide a simplified version of the UTI Record, ie. one
      without app data.
      */
     func shortVersion() -> UtiRecordShort {
+
         var basicRecord = UtiRecordShort()
         basicRecord.uti = self.uti
         basicRecord.extensions = self.extensions
@@ -71,8 +74,20 @@ struct UtiRecord: Encodable {
  MIME types it is bound to, and the parent UTIs to which it conforms.
  */
 struct UtiRecordShort: Encodable {
-    var uti: String = ""
-    var extensions: [String] = []
-    var mimeTypes: [String] = []
-    var parents: [String] = []
+
+    var uti: String                         = ""
+    var extensions: [String]                = []
+    var mimeTypes: [String]                 = []
+    var parents: [String]                   = []
+}
+
+
+struct Settings {
+
+    var doOutputJson: Bool                  = false
+    var showMoreInfo: Bool                  = false
+    var highlightColour: String             = String(Stdio.ShellColour.yellow)
+    var files: [String]                     = []
+    var doLaunchServicesReadApps: Bool      = false
+    var doLaunchServicesReadUtis: Bool      = false
 }
