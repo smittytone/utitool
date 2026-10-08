@@ -1,6 +1,6 @@
 /*
     utitool
-    main.swift
+    utitool.swift
 
     Copyright © 2026 Tony Smith. All rights reserved.
 
@@ -28,6 +28,9 @@ import Foundation
 import Clicore
 
 
+/**
+    Main entry point
+ */
 @main
 struct Utitool {
 
@@ -70,9 +73,9 @@ struct Utitool {
 
                     switch requiresValue {
                         case 1:
-                            exit(getExtensionData(argument, settings))
+                            Stdio.exitApp(getExtensionData(argument, settings))
                         case 2:
-                            exit(getUtiData(argument, true, settings))
+                            Stdio.exitApp(getUtiData(argument, true, settings))
                         default:
                             break
                     }
@@ -116,6 +119,7 @@ struct Utitool {
                 }
             }
 
+            // Run initial LSServices functions
             if settings.doLaunchServicesReadApps {
                 await readLaunchServicesRegister(true, settings)
             }
@@ -124,7 +128,7 @@ struct Utitool {
                 await readLaunchServicesRegister(false, settings)
             }
 
-            // Convert passed paths to URL
+            // Convert passed paths to URLs for processing
             var count = 0
             if settings.files.count > 0 {
                 for file in settings.files {
@@ -134,6 +138,7 @@ struct Utitool {
                     // Check that we're only dealing with files
                     if FileManager.default.fileExists(atPath: path, isDirectory: &isDir) {
                         if isDir.boolValue {
+                            // Ignore directories
                             continue
                         }
 
