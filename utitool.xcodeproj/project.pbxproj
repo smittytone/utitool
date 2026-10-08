@@ -185,6 +185,8 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/utitool/swift.plist",
+				"$(DERIVED_FILE_DIR)/dlist/swift_version.swift",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
