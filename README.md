@@ -2,11 +2,13 @@
 
 `utitool` is a macOS command line tool you can use to reveal a file’s Uniform Type Identifier (UTI).
 
-It can also be used to reveal information about a specified UTI, or the UTI(s) bound to a specified file extension.
+It can also be used to reveal information about a specified UTI, or the UTI(s) bound to a specified file extension. Default editor application, and other apps that say they can open a given UTI or extension, are also listed.
 
 macOS’ Launch Services registry data for UTIs or apps can also be viewed in machine- or human-readable form.
 
-`utitool` requires macOS 11.5 ‘Big Sur’ or above.
+You can use the tool to set the default app for a specific UTI.
+
+`utitool` requires macOS 12.4 ‘Monterey’ or above.
 
 Building `utitool` from source requires my [Clicore Swift Package](https://github.com/smittytone/clicore).
 
