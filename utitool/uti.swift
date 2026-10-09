@@ -58,11 +58,11 @@ extension Utitool {
         if utiTypes.count > 0 {
             Stdio.report("\(String(.bold))UTI information for file extension \(settings.highlightColour).\(extn)\(String(.normal))")
             if utiTypes.count > 1 {
-                for (index, utiType) in utiTypes.enumerated() {
-                    let head = "\(index + 1). \(String(.bold))\(utiType.identifier)\(String(.normal))"
+                for (index, uti) in utiTypes.enumerated() {
+                    let head = "\(index + 1). \(String(.bold))\(uti.identifier)\(String(.normal))"
                     let inset = head.components(separatedBy: ". ")[0].count + 2
                     Stdio.report(head)
-                    showUtiData(utiType, false, inset)
+                    showUtiData(uti, false, inset)
                 }
             } else {
                 Stdio.report("UTI: \(String(.bold))\(utiTypes[0].identifier)\(String(.normal))")
@@ -246,17 +246,17 @@ extension Utitool {
         - utiType:  The UTI as a `UTType` instance.
         - addSpace: Add a four-space prefix. Default: false.
      */
-    internal static func outputAllApps(_ utiType: UTType, _ addSpaces: Int = 0) {
+    internal static func outputAllApps(_ uti: UTType, _ addSpaces: Int = 0) {
 
-        var appURLs = NSWorkspace.shared.urlsForApplications(toOpen: utiType)
-        if appURLs.count > 0, let defaultAppURL = NSWorkspace.shared.urlForApplication(toOpen: utiType) {
+        var appURLs = NSWorkspace.shared.urlsForApplications(toOpen: uti)
+        if appURLs.count > 0, let defaultAppURL = NSWorkspace.shared.urlForApplication(toOpen: uti) {
             appURLs = appURLs.filter {
                 $0 != defaultAppURL
             }
         }
 
         if !appURLs.isEmpty {
-            let apps: [String] = appURLs.map {
+            let apps = appURLs.map {
                 return String($0.lastPathComponent.dropLast(4))
             }
 
@@ -274,12 +274,12 @@ extension Utitool {
      - utiType:  The UTI as a `UTType` instance.
      - addSpace: Add a four-space prefix. Default: false.
      */
-    internal static func outputDescription(_ utiType: UTType, _ addSpaces: Int = 0) {
+    internal static func outputDescription(_ uti: UTType, _ addSpaces: Int = 0) {
 
-        if let desc = utiType.localizedDescription {
+        if let desc = uti.localizedDescription {
             Stdio.report("\(String(repeating: " ", count: addSpaces))Content type: \(desc)")
         } else {
-            Stdio.report("\(String(repeating: " ", count: addSpaces))Content type: \(utiType.debugDescription)")
+            Stdio.report("\(String(repeating: " ", count: addSpaces))Content type: \(uti.debugDescription)")
         }
     }
 
@@ -312,12 +312,17 @@ extension Utitool {
          */
 
         // Tell the user what's happening
-        Stdio.write(message: "Obtaining Launch Services’ registry data. This can take some time ", to: Stdio.ShellRoutes.Error)
+        let intro = "Obtaining Launch Services’ registry data. This can take some time"
+        Stdio.write(message: intro, to: Stdio.ShellRoutes.Error)
 
         // Set up and start the activity display timer
-        let cursorTimer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { time in
-            //Stdio.write(message: Stdio.ShellCursor.Backspace, to: Stdio.ShellRoutes.Error)
-            Stdio.write(message: "•", to: Stdio.ShellRoutes.Error)
+        let clock = ["🕛 ", "🕐 ", "🕑 ", "🕒 ", "🕓 ", "🕔 ", "🕕 ", "🕖 ", "🕗 ", "🕘 ", "🕙 ", "🕚 "]
+        //let clock = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+        var index = 0
+        let cursorTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { time in
+            Stdio.write(message: Stdio.ShellCursor.to(column: intro.count + 2), to: Stdio.ShellRoutes.Error)
+            Stdio.write(message: clock[index], to: Stdio.ShellRoutes.Error)
+            index = (index + 1) % clock.count
         }
 
         let recordPrefix = "type id"
@@ -594,6 +599,8 @@ extension Utitool {
     /**
      Set an known UTI's default app.
 
+     FROM 2.0.0
+
      - Parameters:
         - settings: The current processing settings.
 
@@ -635,6 +642,8 @@ extension Utitool {
 
     /**
      Determine an app's Bundle ID.
+
+     FROM 2.0.0
 
      - Parameters:
         - verifiedAppPath: The path to the app.
