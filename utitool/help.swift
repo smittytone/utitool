@@ -48,7 +48,7 @@ extension Utitool {
                         [--apps/-a] [--json/-j]                    List system app data, with optional JSON output.
                         [--set/-s] {UTI} {app name|path}]          Set the default app for the specified UTI.
             
-            \r\n\(String(.bold))EXAMPLES\(String(.normal))
+            \(String(.bold))EXAMPLES\(String(.normal))
                 utitool text.md                       Get UTI for a named file in the current directory.
                 utitool -m text.md                    Get extended UTI info for a named file in the current directory.
                 utitool text1.md text2.md             Get UTIs for named files in the current directory.

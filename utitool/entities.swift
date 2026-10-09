@@ -27,6 +27,7 @@
 import Foundation
 import Clicore
 
+
 /*
  App Record - data for an app capable of handling zero or more UTIs.
  This is implemented as a struct so we have room to accommodate
@@ -34,8 +35,8 @@ import Clicore
  */
 struct AppRecord: Encodable {
 
-    var name: String                        = ""
-    var utis: [UtiRecordShort]              = []
+    var name: String                                = ""
+    var utis: [UtiRecordShort]                      = []
 }
 
 
@@ -46,12 +47,12 @@ struct AppRecord: Encodable {
  */
 struct UtiRecord: Encodable {
 
-    var uti: String                         = ""
-    var apps: [AppRecord]                   = []
-    var extensions: [String]                = []
-    var mimeTypes: [String]                 = []
-    var parents: [String]                   = []
-    var ref: String                         = ""
+    var uti: String                                 = ""
+    var ref: String                                 = ""
+    var apps: [AppRecord]                           = []
+    var extensions: [String]                        = []
+    var mimeTypes: [String]                         = []
+    var parents: [String]                           = []
 
     /**
      Provide a simplified version of the UTI Record, ie. one
@@ -75,10 +76,10 @@ struct UtiRecord: Encodable {
  */
 struct UtiRecordShort: Encodable {
 
-    var uti: String                         = ""
-    var extensions: [String]                = []
-    var mimeTypes: [String]                 = []
-    var parents: [String]                   = []
+    var uti: String                                 = ""
+    var extensions: [String]                        = []
+    var mimeTypes: [String]                         = []
+    var parents: [String]                           = []
 }
 
 
@@ -87,13 +88,13 @@ struct UtiRecordShort: Encodable {
  */
 struct Settings {
 
-    var doOutputJson: Bool                  = false
-    var showMoreInfo: Bool                  = false
-    var highlightColour: String             = String(Stdio.ShellColour.yellow)
-    var files: [String]                     = []
-    var doLaunchServicesReadApps: Bool      = false
-    var doLaunchServicesReadUtis: Bool      = false
-    var doSetDefaultApp: Bool               = false
+    var doOutputJson: Bool                          = false
+    var showMoreInfo: Bool                          = false
+    var doLaunchServicesReadApps: Bool              = false
+    var doLaunchServicesReadUtis: Bool              = false
+    var doSetDefaultApp: Bool                       = false
+    var highlightColour: String                     = String(Stdio.ShellColour.yellow)
+    var files: [String]                             = []
 }
 
 
@@ -102,8 +103,8 @@ struct Settings {
  */
 public struct SetError: Error, LocalizedError {
 
-    public var code: SetErrorKind           = .noError
-    public var text: String                 = "unknown"
+    public var code: SetErrorKind                   = .noError
+    public var text: String                         = "unknown"
     public var errorDescription: String? {
         switch self.code {
             case .noError:
@@ -126,9 +127,9 @@ public struct SetError: Error, LocalizedError {
  */
 public enum SetErrorKind: Int, Error {
 
-    case noError                            = 0
-    case badUTI                             = 1
-    case badApp                             = 2
-    case badSet                             = 3
-    case badBundle                          = 4
+    case noError                                    = 0
+    case badUTI                                     = 1
+    case badApp                                     = 2
+    case badSet                                     = 3
+    case badBundle                                  = 4
 }

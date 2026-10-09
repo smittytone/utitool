@@ -52,7 +52,7 @@ extension Utitool {
      */
     internal static func dedupeStrings(_ arrayA: [String], _ arrayB: [String]) -> [String] {
 
-        var arrayC: [String] = arrayB
+        var arrayC = arrayB
         var modified = false
         for item in arrayA {
             var got = false
@@ -86,12 +86,7 @@ extension Utitool {
             return ""
         }
 
-        var text = ""
-        for item in items {
-            text += item + ", "
-        }
-
-        return String(text[...].dropLast(2))
+        return String(items.joined(separator: ", "))
     }
 
 

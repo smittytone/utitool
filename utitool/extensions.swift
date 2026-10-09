@@ -35,7 +35,7 @@ extension URL {
         // FROM 1.3.0
         // Min. macOS is 12
         let resourceValues: URLResourceValues? = try? resourceValues(forKeys: [.contentTypeKey])
-        if let uti: UTType = resourceValues!.contentType {
+        if let uti = resourceValues!.contentType {
             return uti.identifier
         } else {
             return nil
@@ -45,7 +45,7 @@ extension URL {
 
     var localizedName: String? {
 
-        let resourceValues: URLResourceValues? = try? resourceValues(forKeys: [.localizedNameKey])
+        let resourceValues = try? resourceValues(forKeys: [.localizedNameKey])
         return resourceValues!.localizedName
     }
 
@@ -53,8 +53,8 @@ extension URL {
     var known: Bool {
 
         if #available(macOS 11, *) {
-            let resourceValues: URLResourceValues? = try? resourceValues(forKeys: [.contentTypeKey])
-            if let uti: UTType = resourceValues!.contentType {
+            let resourceValues = try? resourceValues(forKeys: [.contentTypeKey])
+            if let uti = resourceValues!.contentType {
                 return uti.isDeclared
             }
         }
@@ -86,9 +86,9 @@ extension Scanner {
      */
     func getNextCharacter(in outer: String) -> String {
 
-        let string: NSString = self.string as NSString
-        let idx: Int = self.currentIndex.utf16Offset(in: outer)
-        let nextChar: String = string.substring(with: NSMakeRange(idx, 1))
+        let string = self.string as NSString
+        let idx = self.currentIndex.utf16Offset(in: outer)
+        let nextChar = string.substring(with: NSMakeRange(idx, 1))
         return nextChar
     }
 
