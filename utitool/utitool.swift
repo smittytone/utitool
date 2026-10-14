@@ -106,7 +106,7 @@ struct Utitool {
                     case "-h", "-help", "--help":
                         showHelp()
                         Stdio.exitApp()
-                    case "--version":
+                    case "-v","--version":
                         showHeader()
                         Stdio.exitApp()
                     default:
