@@ -314,6 +314,7 @@ extension Utitool {
         // Tell the user what's happening
         let intro = "Obtaining Launch Services’ registry data. This can take some time"
         Stdio.write(message: intro, to: Stdio.ShellRoutes.Error)
+        Stdio.write(message: Stdio.ShellCursor.Hide, to: Stdio.ShellRoutes.Error)
 
         // Set up and start the activity display timer
         let clock = ["🕛 ", "🕐 ", "🕑 ", "🕒 ", "🕓 ", "🕔 ", "🕕 ", "🕖 ", "🕗 ", "🕘 ", "🕙 ", "🕚 "]
