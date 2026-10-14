@@ -7,7 +7,7 @@ let package = Package(
         .macOS(.v12)
     ],
     dependencies: [
-        .package(url: "https://github.com/smittytone/clicore", branch: "develop"),
+        .package(url: "https://github.com/smittytone/clicore", branch: "develop-linux"),
     ],
     targets: [
         .executableTarget(
