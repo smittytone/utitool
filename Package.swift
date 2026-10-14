@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
     name: "utitool",
     platforms: [
-        .macOS(.v12) // Targets macOS 12 or later
+        .macOS(.v12)
     ],
     dependencies: [
         .package(url: "https://github.com/smittytone/clicore", branch: "develop"),
