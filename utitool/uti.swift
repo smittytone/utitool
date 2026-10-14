@@ -317,7 +317,6 @@ extension Utitool {
 
         // Set up and start the activity display timer
         let clock = ["🕛 ", "🕐 ", "🕑 ", "🕒 ", "🕓 ", "🕔 ", "🕕 ", "🕖 ", "🕗 ", "🕘 ", "🕙 ", "🕚 "]
-        //let clock = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
         var index = 0
         let cursorTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { time in
             Stdio.write(message: Stdio.ShellCursor.to(column: intro.count + 2), to: Stdio.ShellRoutes.Error)
@@ -330,7 +329,6 @@ extension Utitool {
         let recordDelimiter = "--------------------------------------------------------------------------------"
         var utis: [String: UtiRecord] = [:]
         var apps: [String: AppRecord] = [:]
-
 
         // Get the data
         let (errCode, data) = Processes.runProcess(app: "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister", with: ["-dump"])
@@ -595,6 +593,8 @@ extension Utitool {
         return false
     }
 
+
+    // MARK: Default App Functions
 
     /**
      Set an known UTI's default app.
