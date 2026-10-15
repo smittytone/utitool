@@ -4,7 +4,7 @@
     - **Breaking** Minimum supported macOS is now 12.4.
     - Show default app when `--more` used.
     - Show all editor apps when `--more` used.
-    - All a UTI’s default app to be set.
+    - Allow a UTI’s default app to be set.
     - Update to `Clicore 0.8.0` (tracks `develop`).
     - Project build structure changes.
 - 1.2.2 *21 August 2025*
