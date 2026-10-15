@@ -94,6 +94,7 @@ struct Settings {
     var doLaunchServicesReadUtis: Bool              = false
     var doSetDefaultApp: Bool                       = false
     var highlightColour: String                     = String(Stdio.ShellColour.yellow)
+    var altColour: String                           = String(Stdio.ShellColour.magenta)
     var files: [String]                             = []
 }
 

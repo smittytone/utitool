@@ -62,11 +62,11 @@ extension Utitool {
                     let head = "\(index + 1). \(String(.bold))\(uti.identifier)\(String(.normal))"
                     let inset = head.components(separatedBy: ". ")[0].count + 2
                     Stdio.report(head)
-                    showUtiData(uti, false, inset)
+                    showUtiData(uti, settings, false, inset)
                 }
             } else {
                 Stdio.report("UTI: \(String(.bold))\(utiTypes[0].identifier)\(String(.normal))")
-                showUtiData(utiTypes[0], false)
+                showUtiData(utiTypes[0], settings, false)
                 outputDescription(utiTypes[0])
             }
         } else {
@@ -92,7 +92,7 @@ extension Utitool {
                 Stdio.report("\(String(.bold))Information for UTI \(settings.highlightColour)\(uti.identifier)\(String(.normal))")
             }
 
-            showUtiData(uti)
+            showUtiData(uti, settings)
         } else {
             Stdio.report("UTI \(String(.bold))\(utiText)\(String(.normal)) is not known to the system")
         }
@@ -107,7 +107,7 @@ extension Utitool {
         - includeExtensionInfo: Show information on file extensions.
         - inset:                The number of spaces, if any, to indent the readout.
      */
-    private static func showUtiData(_ uti: UTType, _ includeExtensionInfo: Bool = true, _ inset: Int = 0) {
+    private static func showUtiData(_ uti: UTType, _ settings: Settings, _ includeExtensionInfo: Bool = true, _ inset: Int = 0) {
 
         outputDescription(uti, inset)
 
@@ -122,8 +122,8 @@ extension Utitool {
         outputRefUrl(uti, inset)
         outputStatus(uti, inset)
         // FROM 2.0.0
-        outputDefaultApp(uti, inset)
-        outputAllApps(uti, inset)
+        outputDefaultApp(uti, settings, inset)
+        outputAllApps(uti, settings, inset)
     }
 
 
@@ -223,7 +223,7 @@ extension Utitool {
         - utiType:  The UTI as a `UTType` instance.
         - addSpace: Add a four-space prefix. Default: false.
      */
-    internal static func outputDefaultApp(_ utiType: UTType, _ addSpaces: Int = 0) {
+    internal static func outputDefaultApp(_ utiType: UTType, _ settings: Settings, _ addSpaces: Int = 0) {
 
         guard let appURL = NSWorkspace.shared.urlForApplication(toOpen: utiType) else {
             Stdio.report("\(String(repeating: " ", count: addSpaces))Default app: None")
@@ -235,7 +235,7 @@ extension Utitool {
             bundleID = bid
         }
 
-        Stdio.report("\(String(repeating: " ", count: addSpaces))Default app: \(String(.underline))\(appURL.lastPathComponent.dropLast(4))\(String(.normal)) (\(bundleID))")
+        Stdio.report("\(String(repeating: " ", count: addSpaces))Default app: \(settings.altColour)\(appURL.lastPathComponent.dropLast(4))\(String(.normal)) (\(bundleID))")
     }
 
 
@@ -246,7 +246,7 @@ extension Utitool {
         - utiType:  The UTI as a `UTType` instance.
         - addSpace: Add a four-space prefix. Default: false.
      */
-    internal static func outputAllApps(_ uti: UTType, _ addSpaces: Int = 0) {
+    internal static func outputAllApps(_ uti: UTType, _ settings: Settings, _ addSpaces: Int = 0) {
 
         var appURLs = NSWorkspace.shared.urlsForApplications(toOpen: uti)
         if appURLs.count > 0, let defaultAppURL = NSWorkspace.shared.urlForApplication(toOpen: uti) {
@@ -257,11 +257,11 @@ extension Utitool {
 
         if !appURLs.isEmpty {
             let apps = appURLs.map {
-                return String($0.lastPathComponent.dropLast(4))
+                return "\(settings.highlightColour)" + String($0.lastPathComponent.dropLast(4)) + "\(String(.normal))"
             }
 
             let appList = apps.joined(separator: ", ")
-            Stdio.report("\(String(repeating: " ", count: addSpaces))Other supporting apps: \(String(.underline))\(appList)\(String(.normal))")
+            Stdio.report("\(String(repeating: " ", count: addSpaces))Other supporting apps: \(appList)")
         }
     }
 
