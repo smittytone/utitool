@@ -27,3 +27,5 @@ See [Changelog](./CHANGELOG.md)
 ## Licence ##
 
 *utitool* is copyright © 2026, Tony Smith. Its source code is released under the MIT Licence.
+
+_AI was not used in the development of this software. This is a statement of plain fact, not of policy. AI tools may be used in future._
