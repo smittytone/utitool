@@ -257,7 +257,7 @@ extension Utitool {
 
         if !appURLs.isEmpty {
             let apps = appURLs.map {
-                return "\(settings.highlightColour)" + String($0.lastPathComponent.dropLast(4)) + "\(String(.normal))"
+                return "\(settings.altColour)" + String($0.lastPathComponent.dropLast(4)) + "\(String(.normal))"
             }
 
             let appList = apps.joined(separator: ", ")
