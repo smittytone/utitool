@@ -34,6 +34,7 @@ TARGET_FILE="${SCRIPT_DIR}/utitool/swift_version.swift"
 TARGET_PLIST="${SCRIPT_DIR}/utitool/swift.plist"
 CONFIGURATION="${CONFIGURATION:-${1:-Release}}"
 IN_XCODE=""
+YEAR=$(date +%Y)
 
 if [ -n "${MARKETING_VERSION:-}" ] && [ -n "${CURRENT_PROJECT_VERSION:-}" ]; then
     # Already running inside an Xcode build phase for a specific target/
@@ -70,7 +71,7 @@ fi
 case "${BUILD}" in
     ''|*[!0-9]*)
         if [ "${IN_XCODE}" = "1" ]; then
-            echo "sync-version:74:error:CURRENT_PROJECT_VERSION is not a plain integer: ${BUILD}"
+            echo "[SYNC-VERSION ERROR] CURRENT_PROJECT_VERSION is not a plain integer: ${BUILD}"
         else
             printf '⛔️ CURRENT_PROJECT_VERSION is not a plain integer: %s\n' "${BUILD}" >&2
         fi
@@ -86,7 +87,7 @@ cat > "${TARGET_FILE}" <<EOF
     utitool
     swift_version.swift
 
-    Copyright © 2026 Tony Smith. All rights reserved.
+    Copyright © ${YEAR} Tony Smith. All rights reserved.
 
     MIT License
     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -122,16 +123,17 @@ printf 'Version written to %s: version %s, build %s\n' "${TARGET_FILE}" "${VERSI
 if [ -f "${TARGET_PLIST}" ]; then
     /usr/libexec/plistbuddy -c "set CFBundleShortVersionString ${ESCAPED_VERSION}" "${TARGET_PLIST}"
     /usr/libexec/plistbuddy -c "set CFBundleVersion ${BUILD}" "${TARGET_PLIST}"
-    /usr/libexec/plistbuddy -c "set CFBundleGetInfoString utitool\ ${ESCAPED_VERSION}\ copyright\ ©\ 2026,\ Tony\ Smith.\ All\ rights\ reserved" "${TARGET_PLIST}"
+    /usr/libexec/plistbuddy -c "set CFBundleGetInfoString utitool\ ${ESCAPED_VERSION}\ copyright\ ©\ ${YEAR},\ Tony\ Smith.\ All\ rights\ reserved" "${TARGET_PLIST}"
+    /usr/libexec/plistbuddy -c "set NSHumanReadableCopyright Copyright\ ©\ ${YEAR},\ Tony\ Smith.\ All\ rights\ reserved" "${TARGET_PLIST}"
     
     if [ "${IN_XCODE}" = "1" ]; then
-        echo "sync-version:122:error:Version written to ${TARGET_PLIST}: version ${VERSION}, build ${BUILD})"
+        echo "[SYNC-VERSION ERROR] Version written to ${TARGET_PLIST}: version ${VERSION}, build ${BUILD})"
     else
         printf 'Version written to %s: version %s, build %s\n' "${TARGET_PLIST}" "${VERSION}" "${BUILD})"
     fi
 else
     if [ "${IN_XCODE}" = "1" ]; then
-        echo "sync-version:122:error:Pre-formed swift.plist file missing from the source directory"
+        echo "[SYNC-VERSION ERROR] Pre-formed swift.plist file missing from the source directory"
     else
         printf '⛔️ Pre-formed swift.plist file missing from the source directory'
     fi
