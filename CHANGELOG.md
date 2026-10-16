@@ -1,6 +1,6 @@
 ## Release Notes ##
 
-- 2.0.0 *Unreleased*
+- 2.0.0 *16 October 2026*
     - **Breaking** Minimum supported macOS is now 12.4.
     - Show default app when `--more` used.
     - Show all editor apps when `--more` used.
