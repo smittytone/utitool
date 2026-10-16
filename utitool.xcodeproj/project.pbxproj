@@ -103,7 +103,7 @@
 				3BF0A48B30778435006259CF /* Package.swift */,
 				3BAF65C23077833B0066FBFB /* sync-version.sh */,
 			);
-			path = Misc;
+			name = Misc;
 			sourceTree = SOURCE_ROOT;
 		};
 		3B8812B52E550F270023DDF1 /* manpage */ = {
@@ -161,7 +161,6 @@
 				Base,
 			);
 			mainGroup = 3B8812872E550E510023DDF1;
-			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				3B8812AD2E550EC40023DDF1 /* XCRemoteSwiftPackageReference "clicore" */,
 			);
